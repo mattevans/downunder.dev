@@ -281,14 +281,15 @@ section:nth-child(8){animation-delay:0.35s}
   <h2>Event Inventory</h2>
 
   <details open>
-    <summary>New Sentry SSE Events (real-time) <span class="pill pill-todo">4 events</span></summary>
+    <summary>New Sentry SSE Events (real-time) <span class="pill pill-done">4 events</span></summary>
     <div class="content">
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">The core Gloas SSE events have already been proposed and merged into the <a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml">beacon-APIs spec</a> via <a href="https://github.com/ethereum/beacon-APIs/pull/552">PR#552</a>. We just need to implement sentry handlers.</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th><th>beacon-APIs</th></tr></thead>
         <tbody>
-          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Verified payload + blob availability</td><td><span class="pill pill-done">IN SPEC</span> <code>execution_payload_available</code></td></tr>
-          <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td>Individual PTC (~512/slot)</td><td><span class="pill pill-done">IN SPEC</span> <code>payload_attestation_message</code></td></tr>
-          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td>All builder bids</td><td><span class="pill pill-done">IN SPEC</span> <code>execution_payload_bid</code></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Verified payload + blob availability</td><td><code>execution_payload_available</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
+          <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td>Individual PTC (~512/slot)</td><td><code>payload_attestation_message</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td>All builder bids</td><td><code>execution_payload_bid</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
           <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td>Proposer preferences</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a> <span class="pill pill-info">IN-FLIGHT</span></td></tr>
         </tbody>
       </table>
