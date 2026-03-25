@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ePBS — Glamsterdam / Xatu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080b12;--bg2:#0d1117;--bg3:#151b27;--bg4:#1c2333;
+  --border:#1e2a3a;--border2:#2a3a4e;
+  --text:#b8c4d4;--text2:#8899aa;--text3:#5a6a7a;
+  --white:#e2e8f0;
+  --accent:#22d3a8;--accent2:#0ea67a;--accent-dim:rgba(34,211,168,0.1);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.1);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.1);
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 80% 0%,rgba(59,130,246,0.03),transparent);pointer-events:none;z-index:0}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,11,18,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem}
+nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:2rem;height:52px}
+nav .logo{font-family:var(--mono);font-weight:700;font-size:0.85rem;color:var(--white);display:flex;align-items:center;gap:0.5rem}
+nav .logo span{color:var(--accent)}
+nav .links{display:flex;gap:0.25rem}
+nav .links a{font-family:var(--mono);font-size:0.75rem;color:var(--text2);text-decoration:none;padding:0.35rem 0.75rem;border-radius:4px;transition:all 0.15s}
+nav .links a:hover{color:var(--white);background:var(--bg3)}
+nav .links a.active{color:var(--accent);background:var(--accent-dim)}
+nav .raw{margin-left:auto;font-family:var(--mono);font-size:0.7rem;color:var(--text3);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;transition:all 0.15s}
+nav .raw:hover{color:var(--text);border-color:var(--border2)}
+main{max-width:1200px;margin:0 auto;padding:2rem;position:relative;z-index:1}
+.hero{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.hero h1{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--white);letter-spacing:-0.02em;margin-bottom:0.25rem}
+.hero h1 span{color:var(--blue)}
+.hero .sub{font-family:var(--mono);font-size:0.8rem;color:var(--text2);margin-bottom:1rem}
+.hero .meta{display:flex;flex-wrap:wrap;gap:0.5rem}
+.hero .tag{font-family:var(--mono);font-size:0.7rem;padding:0.25rem 0.6rem;border-radius:3px;border:1px solid var(--border);color:var(--text2)}
+.hero .tag a{color:var(--accent);text-decoration:none}
+section{margin-bottom:2rem;animation:fadeUp 0.4s ease both}
+section:nth-child(2){animation-delay:0.05s}section:nth-child(3){animation-delay:0.1s}section:nth-child(4){animation-delay:0.15s}section:nth-child(5){animation-delay:0.2s}section:nth-child(6){animation-delay:0.25s}section:nth-child(7){animation-delay:0.3s}section:nth-child(8){animation-delay:0.35s}section:nth-child(9){animation-delay:0.4s}section:nth-child(10){animation-delay:0.45s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+section h2{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--white);padding-bottom:0.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+section h3{font-family:var(--mono);font-size:0.85rem;font-weight:600;color:var(--white);margin:1rem 0 0.5rem}
+p{margin-bottom:0.75rem;font-size:0.9rem}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{color:var(--white);font-weight:600}
+code{font-family:var(--mono);font-size:0.8rem;background:var(--bg3);padding:0.1rem 0.35rem;border-radius:3px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:1rem;overflow-x:auto;margin-bottom:1rem;font-family:var(--mono);font-size:0.78rem;line-height:1.7;color:var(--text)}
+pre .kw{color:var(--blue)}
+pre .type{color:var(--accent)}
+pre .comment{color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem}
+th{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);text-align:left;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border);font-weight:500}
+td{padding:0.5rem 0.75rem;border-bottom:1px solid rgba(30,42,58,0.5);color:var(--text);vertical-align:top}
+tr:hover td{background:rgba(13,17,23,0.5)}
+.pill{display:inline-block;font-family:var(--mono);font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:3px;font-weight:500}
+.pill-done{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(34,211,168,0.2)}
+.pill-todo{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.2)}
+.pill-blocked{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.pill-info{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.2)}
+.pill-p0{background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.pill-p1{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.2)}
+.pill-new{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,0.2)}
+.pill-mod{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.2)}
+details{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:0.75rem;overflow:hidden}
+details[open]{border-color:var(--border2)}
+summary{font-family:var(--mono);font-size:0.8rem;font-weight:500;color:var(--white);padding:0.75rem 1rem;cursor:pointer;user-select:none;display:flex;align-items:center;gap:0.5rem;transition:background 0.15s}
+summary:hover{background:var(--bg3)}
+summary::marker{content:''}
+summary::before{content:'\25B6';font-size:0.55rem;color:var(--text3);transition:transform 0.2s;flex-shrink:0}
+details[open] summary::before{transform:rotate(90deg)}
+summary .pill{margin-left:auto}
+details .content{padding:0.75rem 1rem 1rem}
+details .content p{font-size:0.85rem}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:800px){.cols{grid-template-columns:1fr}}
+
+/* TIMING DIAGRAM */
+.timing{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;overflow-x:auto}
+.timing-bar{position:relative;height:80px;margin:1rem 0}
+.timing-track{position:absolute;top:36px;left:0;right:0;height:2px;background:var(--border)}
+.timing-mark{position:absolute;display:flex;flex-direction:column;align-items:center}
+.timing-mark .dot{width:10px;height:10px;border-radius:50%;border:2px solid;position:relative;top:31px}
+.timing-mark .label{font-family:var(--mono);font-size:0.65rem;color:var(--text2);position:relative;top:38px;white-space:nowrap}
+.timing-mark .time{font-family:var(--mono);font-size:0.6rem;color:var(--text3);position:relative;top:0;white-space:nowrap}
+.timing-mark .event{font-family:var(--mono);font-size:0.7rem;color:var(--white);position:relative;top:14px;white-space:nowrap;font-weight:500}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <div class="logo"><span>&diamondsuit;</span> XATU <span>/</span> GLAMSTERDAM</div>
+    <div class="links">
+      <a href="index.html">Overview</a>
+      <a href="bals.html">BALs</a>
+      <a href="epbs.html" class="active">ePBS</a>
+    </div>
+    <a href="glamsterdam_epbs.md" class="raw">raw .md</a>
+  </div>
+</nav>
+
+<main>
+
+<div class="hero">
+  <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
+  <div class="sub">EIP-7732 &mdash; Status: Planning (blocked on upstream)</div>
+  <div class="meta">
+    <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork-choice.md">fork-choice</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md">p2p-interface</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/validator.md">validator</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/builder.md">builder</a></span>
+  </div>
+</div>
+
+<!-- PROTO TYPES -->
+<section>
+  <h2>New Proto Types to Define</h2>
+
+  <details open>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadbid" style="color:var(--white)">ExecutionPayloadBid</a> <span class="pill pill-new">NEW</span></summary>
+    <div class="content">
+<pre><span class="kw">class</span> <span class="type">ExecutionPayloadBid</span>(Container):
+    parent_block_hash: Hash32
+    parent_block_root: Root
+    block_hash: Hash32
+    prev_randao: Bytes32
+    fee_recipient: ExecutionAddress
+    gas_limit: uint64
+    builder_index: BuilderIndex
+    slot: Slot
+    value: Gwei
+    execution_payment: Gwei
+    blob_kzg_commitments: List[KZGCommitment, MAX_BLOB_COMMITMENTS_PER_BLOCK]
+
+<span class="kw">class</span> <span class="type">SignedExecutionPayloadBid</span>(Container):
+    message: ExecutionPayloadBid
+    signature: BLSSignature</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadenvelope" style="color:var(--white)">ExecutionPayloadEnvelope</a> <span class="pill pill-new">NEW</span></summary>
+    <div class="content">
+<pre><span class="kw">class</span> <span class="type">ExecutionPayloadEnvelope</span>(Container):
+    payload: ExecutionPayload
+    execution_requests: ExecutionRequests
+    builder_index: BuilderIndex
+    beacon_block_root: Root
+    slot: Slot
+    state_root: Root
+
+<span class="kw">class</span> <span class="type">SignedExecutionPayloadEnvelope</span>(Container):
+    message: ExecutionPayloadEnvelope
+    signature: BLSSignature</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#payloadattestationdata" style="color:var(--white)">PayloadAttestation (PTC)</a> <span class="pill pill-new">NEW</span></summary>
+    <div class="content">
+<pre><span class="kw">class</span> <span class="type">PayloadAttestationData</span>(Container):
+    beacon_block_root: Root
+    slot: Slot
+    payload_present: boolean
+    blob_data_available: boolean
+
+<span class="kw">class</span> <span class="type">PayloadAttestationMessage</span>(Container):
+    validator_index: ValidatorIndex
+    data: PayloadAttestationData
+    signature: BLSSignature
+
+<span class="kw">class</span> <span class="type">PayloadAttestation</span>(Container):
+    aggregation_bits: Bitvector[PTC_SIZE]  <span class="comment"># 512 bits</span>
+    data: PayloadAttestationData
+    signature: BLSSignature
+
+<span class="kw">class</span> <span class="type">IndexedPayloadAttestation</span>(Container):
+    attesting_indices: List[ValidatorIndex, PTC_SIZE]
+    data: PayloadAttestationData
+    signature: BLSSignature</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#builder" style="color:var(--white)">Builder</a> + <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#new-proposerpreferences" style="color:var(--white)">ProposerPreferences</a> <span class="pill pill-new">NEW</span></summary>
+    <div class="content">
+<pre><span class="kw">class</span> <span class="type">Builder</span>(Container):
+    pubkey: BLSPubkey
+    version: uint8
+    execution_address: ExecutionAddress
+    balance: Gwei
+    deposit_epoch: Epoch
+    withdrawable_epoch: Epoch
+
+<span class="kw">class</span> <span class="type">ProposerPreferences</span>(Container):
+    proposal_slot: Slot
+    validator_index: ValidatorIndex
+    fee_recipient: ExecutionAddress
+    gas_limit: uint64
+
+<span class="kw">class</span> <span class="type">SignedProposerPreferences</span>(Container):
+    message: ProposerPreferences
+    signature: BLSSignature</pre>
+    </div>
+  </details>
+
+  <details>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#beaconblockbody" style="color:var(--white)">Modified BeaconBlockBody</a> <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p><strong>Removed:</strong> <code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code></p>
+      <p><strong>Added:</strong> <code>signed_execution_payload_bid</code>, <code>payload_attestations: List[PayloadAttestation, 4]</code></p>
+    </div>
+  </details>
+</section>
+
+<!-- NEW EVENTS -->
+<section>
+  <h2>New Events to Implement</h2>
+  <div class="cols">
+    <div>
+      <h3>Sentry SSE (real-time)</h3>
+      <table>
+        <thead><tr><th>Event</th><th>Description</th><th><a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml">beacon-APIs</a></th></tr></thead>
+        <tbody>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Verified payload + blob availability</td><td><span class="pill pill-done">IN SPEC</span> <code>execution_payload_available</code></td></tr>
+          <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td>Individual PTC (~512/slot)</td><td><span class="pill pill-done">IN SPEC</span> <code>payload_attestation_message</code></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td>All builder bids</td><td><span class="pill pill-done">IN SPEC</span> <code>execution_payload_bid</code></td></tr>
+          <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td>Proposer preferences</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a> in-flight</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Cannon Derived (from finalized blocks)</h3>
+      <table>
+        <tbody>
+          <tr><td><code>..._BLOCK_PAYLOAD_ATTESTATION</code></td><td>Aggregated PTC from block (max 4)</td></tr>
+          <tr><td><code>..._BLOCK_EXECUTION_PAYLOAD_BID</code></td><td>Winning bid from block (1/block)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <h3>P2P Gossip (CL mimicry)</h3>
+  <table>
+    <thead><tr><th>Event</th><th>Gossip Topic</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><code>execution_payload</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><code>execution_payload_bid</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload_bid">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><code>payload_attestation_message</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#payload_attestation_message">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><code>proposer_preferences</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#proposer_preferences">spec</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- EXISTING EVENTS -->
+<section>
+  <h2>Existing Events to Modify</h2>
+  <details open>
+    <summary>BeaconBlock Events <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p><code>BEACON_API_ETH_V2_BEACON_BLOCK</code>, <code>..._EVENTS_BLOCK</code>, <code>..._VALIDATOR_BLOCK</code></p>
+      <p>Block body no longer contains <code>execution_payload</code>, <code>blob_kzg_commitments</code>, or <code>execution_requests</code>. Has <code>signed_execution_payload_bid</code> and <code>payload_attestations</code> instead.</p>
+      <p><strong>ClickHouse:</strong> New columns: <code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code></p>
+    </div>
+  </details>
+  <details>
+    <summary>Transaction / Withdrawal / BAL Derivers <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p>Transactions, withdrawals, and BALs now in <code>ExecutionPayloadEnvelope</code>. Cannon derivers must source from envelope, not block body.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Attestation Events &mdash; Index Semantic Change <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#beacon_aggregate_and_proof">Index field repurposed</a>: <code>0</code> = same-slot / payload not present, <code>1</code> = payload present.</p>
+    </div>
+  </details>
+  <details>
+    <summary>DataColumnSidecar &mdash; Structural Change <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#modified-datacolumnsidecar">Removed</a>: <code>signed_block_header</code>, <code>kzg_commitments</code>, <code>kzg_commitments_inclusion_proof</code>. Added: <code>slot</code>, <code>beacon_block_root</code>.</p>
+      <p><strong>Approach:</strong> Additive only. New columns, NULL for Fulu rows.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Fork Choice Dumps <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p>Tracks <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork-choice.md#types"><code>PayloadStatus</code></a> per node: EMPTY (0), FULL (1), PENDING (2). New Store fields: <code>payload_states</code>, <code>payload_timeliness_vote</code>, <code>payload_data_availability_vote</code>.</p>
+    </div>
+  </details>
+  <details>
+    <summary>Withdrawal Events <span class="pill pill-mod">MODIFIED</span></summary>
+    <div class="content">
+      <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#modified-get_expected_withdrawals"><code>get_expected_withdrawals</code></a> now includes builder withdrawals via <code>BUILDER_INDEX_FLAG = 2^40</code>.</p>
+    </div>
+  </details>
+</section>
+
+<!-- CLICKHOUSE -->
+<section>
+  <h2>New ClickHouse Tables</h2>
+  <table>
+    <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>canonical_beacon_block_payload_attestation</code></td><td>slot, beacon_block_root, aggregation_bits, payload_present, blob_data_available, attesting_validator_count</td></tr>
+      <tr><td><code>canonical_beacon_block_execution_payload_bid</code></td><td>slot, builder_index, block_hash, parent_block_hash, parent_block_root, value, execution_payment, fee_recipient, gas_limit, blob_commitment_count</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_execution_payload</code></td><td>slot, block_root, builder_index, execution_payload_hash, arrival_time</td></tr>
+      <tr><td><code>libp2p_..._execution_payload_envelope</code></td><td>slot, builder_index, block_root, propagation_time</td></tr>
+      <tr><td><code>libp2p_..._payload_attestation_message</code></td><td>slot, validator_index, beacon_block_root, payload_present, blob_data_available</td></tr>
+      <tr><td><code>libp2p_..._execution_payload_bid</code></td><td>slot, builder_index, block_hash, value, execution_payment</td></tr>
+      <tr><td><code>libp2p_..._proposer_preferences</code></td><td>slot, validator_index, fee_recipient, gas_limit</td></tr>
+    </tbody>
+  </table>
+  <h3>Modified Tables</h3>
+  <table>
+    <tbody>
+      <tr><td><code>beacon_api_eth_v2_beacon_block</code> / <code>canonical_beacon_block</code></td><td>+ <code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code></td></tr>
+      <tr><td>DataColumnSidecar tables</td><td>+ <code>slot</code> (Nullable), <code>beacon_block_root</code> (Nullable)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- COMPONENT CHANGES -->
+<section>
+  <h2>Component Changes</h2>
+  <div class="cols">
+    <div>
+      <h3>Sentry</h3>
+      <table>
+        <tbody>
+          <tr><td><span class="pill pill-new">NEW</span></td><td><code>OnExecutionPayload</code> subscription</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>OnBlock</code> &mdash; handle Gloas blocks</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td>Block version detection for Gloas</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Cannon Derivers</h3>
+      <table>
+        <tbody>
+          <tr><td><span class="pill pill-new">NEW</span></td><td><code>PayloadAttestation</code> deriver</td></tr>
+          <tr><td><span class="pill pill-new">NEW</span></td><td><code>ExecutionPayloadBid</code> deriver</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>BeaconBlock</code> &mdash; no inline payload</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>ExecutionTransaction</code> &mdash; from envelope</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>Withdrawal</code> &mdash; from envelope + builders</td></tr>
+          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>BlockAccessList</code> &mdash; from envelope</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <h3>Server / Event Ingester</h3>
+  <p>Register all new event types in router. New handlers + persistence/location for new cannon types.</p>
+  <h3>Vector Pipeline</h3>
+  <p>New routing rules, VRL transforms, ClickHouse sink configurations for each new event type.</p>
+</section>
+
+<!-- TYSM -->
+<section>
+  <h2>TYSM: Direct Event Capture</h2>
+  <p><a href="https://github.com/ethpandaops/tysm">TYSM</a> hooks into Prysm directly. Upstream already has preliminary Gloas support.</p>
+
+  <h3>New TYSM Hooks</h3>
+  <table>
+    <thead><tr><th>Event</th><th>Hook Into</th><th>Xatu TraceEvent</th><th></th></tr></thead>
+    <tbody>
+      <tr><td><code>OnPayloadAttestationReceive</code></td><td>PTC gossip validation</td><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><span class="pill pill-p0">P0</span></td></tr>
+      <tr><td><code>OnExecPayloadEnvelopeReceive</code></td><td>Envelope gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><span class="pill pill-p0">P0</span></td></tr>
+      <tr><td><code>OnExecPayloadBidReceive</code></td><td>Bid gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><span class="pill pill-p0">P0</span></td></tr>
+      <tr><td><code>OnProposerPreferencesReceive</code></td><td>Preferences gossip</td><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><span class="pill pill-p1">P1</span></td></tr>
+      <tr><td><code>OnPayloadAttestationProcessed</code></td><td>PTC pool insertion</td><td>(enriched event)</td><td><span class="pill pill-p1">P1</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Implementation per Hook</h3>
+  <p style="font-size:0.82rem">Each follows the existing pattern (e.g., <code>OnBlockReceive</code>):</p>
+  <ol style="font-size:0.82rem;padding-left:1.5rem;color:var(--text2)">
+    <li>Event type in <code>/overlay/tysm/events/</code></li>
+    <li>Interface in <code>/overlay/tysm/interfaces/</code></li>
+    <li>Dispatcher in <code>/overlay/tysm/dispatcher/p2p_gossip.go</code></li>
+    <li>Emit function in <code>/overlay/tysm/inject.go</code></li>
+    <li>Xatu forwarder in <code>/overlay/tysm/xatu/forwarder/handlers.go</code></li>
+    <li>Prysm patch at gossip validation point</li>
+  </ol>
+
+  <h3>Existing TYSM Events Changing Under Gloas</h3>
+  <table>
+    <thead><tr><th>Event</th><th>Change</th></tr></thead>
+    <tbody>
+      <tr><td><code>OnBlockReceive</code></td><td>Gloas blocks have bid, no payload &mdash; verify forwarding</td></tr>
+      <tr><td><code>OnAttestationReceive</code></td><td>Index field now 0/1 payload vote &mdash; verify mapping</td></tr>
+      <tr><td><code>OnDataColumnReceive</code></td><td>Sidecar structure changed &mdash; verify forwarding</td></tr>
+      <tr><td><code>OnEngineNewPayload</code></td><td>V5 with BALs + slotNumber &mdash; verify version capture</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- DEPS -->
+<section>
+  <h2>Upstream Dependencies</h2>
+  <table>
+    <thead><tr><th>Dependency</th><th>Status</th><th>Blocker?</th></tr></thead>
+    <tbody>
+      <tr><td><code>go-eth2-client</code> ePBS</td><td><a href="https://github.com/pk910/go-eth2-client/pull/4">PR#4</a> &mdash; Open</td><td><span class="pill pill-blocked">BLOCKS SENTRY+CANNON</span></td></tr>
+      <tr><td><code>go-eth2-client</code> combined</td><td>Not started</td><td><span class="pill pill-blocked">BLOCKED</span></td></tr>
+      <tr><td><code>go-ethereum</code> ePBS</td><td>TBD</td><td>Unknown</td></tr>
+      <tr><td><code>ethcore</code> ePBS</td><td>TBD</td><td>Unknown</td></tr>
+      <tr><td><code>tysm</code> Gloas hooks</td><td>Architecture ready</td><td><span class="pill pill-done">NO &mdash; WE CONTROL</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+</body>
+</html>

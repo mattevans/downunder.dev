@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BALs — Glamsterdam / Xatu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080b12;--bg2:#0d1117;--bg3:#151b27;--bg4:#1c2333;
+  --border:#1e2a3a;--border2:#2a3a4e;
+  --text:#b8c4d4;--text2:#8899aa;--text3:#5a6a7a;
+  --white:#e2e8f0;
+  --accent:#22d3a8;--accent2:#0ea67a;--accent-dim:rgba(34,211,168,0.1);
+  --amber:#f5a623;--amber-dim:rgba(245,166,35,0.1);
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.1);
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.1);
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+html{font-size:15px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(34,211,168,0.03),transparent);pointer-events:none;z-index:0}
+nav{position:sticky;top:0;z-index:100;background:rgba(8,11,18,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem}
+nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:2rem;height:52px}
+nav .logo{font-family:var(--mono);font-weight:700;font-size:0.85rem;color:var(--white);letter-spacing:0.02em;display:flex;align-items:center;gap:0.5rem}
+nav .logo span{color:var(--accent)}
+nav .links{display:flex;gap:0.25rem}
+nav .links a{font-family:var(--mono);font-size:0.75rem;color:var(--text2);text-decoration:none;padding:0.35rem 0.75rem;border-radius:4px;transition:all 0.15s}
+nav .links a:hover{color:var(--white);background:var(--bg3)}
+nav .links a.active{color:var(--accent);background:var(--accent-dim)}
+nav .raw{margin-left:auto;font-family:var(--mono);font-size:0.7rem;color:var(--text3);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;transition:all 0.15s}
+nav .raw:hover{color:var(--text);border-color:var(--border2)}
+main{max-width:1200px;margin:0 auto;padding:2rem;position:relative;z-index:1}
+.hero{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem}
+.hero h1{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--white);letter-spacing:-0.02em;margin-bottom:0.25rem}
+.hero h1 span{color:var(--accent)}
+.hero .sub{font-family:var(--mono);font-size:0.8rem;color:var(--text2);margin-bottom:1rem}
+.hero .meta{display:flex;flex-wrap:wrap;gap:0.5rem}
+.hero .tag{font-family:var(--mono);font-size:0.7rem;padding:0.25rem 0.6rem;border-radius:3px;border:1px solid var(--border);color:var(--text2)}
+.hero .tag a{color:var(--accent);text-decoration:none}
+section{margin-bottom:2rem;animation:fadeUp 0.4s ease both}
+section:nth-child(2){animation-delay:0.05s}section:nth-child(3){animation-delay:0.1s}section:nth-child(4){animation-delay:0.15s}section:nth-child(5){animation-delay:0.2s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+section h2{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--white);padding-bottom:0.5rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
+p{margin-bottom:0.75rem;font-size:0.9rem}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+strong{color:var(--white);font-weight:600}
+code{font-family:var(--mono);font-size:0.8rem;background:var(--bg3);padding:0.1rem 0.35rem;border-radius:3px;color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem}
+th{font-family:var(--mono);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);text-align:left;padding:0.5rem 0.75rem;border-bottom:1px solid var(--border);font-weight:500}
+td{padding:0.5rem 0.75rem;border-bottom:1px solid rgba(30,42,58,0.5);color:var(--text);vertical-align:top}
+tr:hover td{background:rgba(13,17,23,0.5)}
+.pill{display:inline-block;font-family:var(--mono);font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:3px;font-weight:500}
+.pill-done{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(34,211,168,0.2)}
+.pill-todo{background:var(--amber-dim);color:var(--amber);border:1px solid rgba(245,166,35,0.2)}
+details{background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:0.75rem;overflow:hidden}
+details[open]{border-color:var(--border2)}
+summary{font-family:var(--mono);font-size:0.8rem;font-weight:500;color:var(--white);padding:0.75rem 1rem;cursor:pointer;user-select:none;display:flex;align-items:center;gap:0.5rem;transition:background 0.15s}
+summary:hover{background:var(--bg3)}
+summary::marker{content:''}
+summary::before{content:'\25B6';font-size:0.55rem;color:var(--text3);transition:transform 0.2s;flex-shrink:0}
+details[open] summary::before{transform:rotate(90deg)}
+summary .pill{margin-left:auto}
+details .content{padding:0.75rem 1rem 1rem}
+details .content p{font-size:0.85rem}
+
+/* TASK CARD */
+.task{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:0 6px 6px 0;padding:1rem 1.25rem;margin-bottom:0.75rem;transition:border-color 0.2s}
+.task:hover{border-left-color:var(--accent)}
+.task .num{font-family:var(--mono);font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.25rem}
+.task h3{font-family:var(--mono);font-size:0.9rem;color:var(--white);margin-bottom:0.4rem}
+.task p{font-size:0.82rem;margin-bottom:0.5rem;color:var(--text)}
+.task ul{font-size:0.82rem;padding-left:1.25rem;color:var(--text2)}
+.task ul li{margin-bottom:0.2rem}
+.task .spec{font-family:var(--mono);font-size:0.7rem;margin-top:0.5rem}
+
+.status-bar-big{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;margin:1rem 0 0.5rem;max-width:400px}
+.status-bar-big .fill{height:100%;border-radius:4px;background:var(--accent)}
+.pct{font-family:var(--mono);font-size:0.75rem;color:var(--text2)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <div class="logo"><span>&diamondsuit;</span> XATU <span>/</span> GLAMSTERDAM</div>
+    <div class="links">
+      <a href="index.html">Overview</a>
+      <a href="bals.html" class="active">BALs</a>
+      <a href="epbs.html">ePBS</a>
+    </div>
+    <a href="glamsterdam_bals.md" class="raw">raw .md</a>
+  </div>
+</nav>
+
+<main>
+
+<div class="hero">
+  <h1><span>BALs</span> &mdash; Block-Level Access Lists</h1>
+  <div class="sub">EIP-7928 + EIP-8159 (eth/71) &mdash; Branch: release/gloas</div>
+  <div class="meta">
+    <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7928">EIP-7928</a></span>
+    <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></span>
+    <span class="tag"><a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">execution-specs</a></span>
+  </div>
+  <div class="status-bar-big"><div class="fill" style="width:80%"></div></div>
+  <div class="pct">~80% complete &mdash; Core pipeline implemented. 7 tasks remaining.</div>
+</div>
+
+<!-- REMAINING WORK -->
+<section>
+  <h2>Remaining Work</h2>
+
+  <div class="task">
+    <div class="num">Task 1</div>
+    <h3>Storage Reads &mdash; Proto + Conversion</h3>
+    <p>The BAL spec includes <code>storage_reads: List[StorageKey]</code> per account &mdash; slots accessed but not written. <strong>Not currently captured.</strong></p>
+    <ul>
+      <li><code>BlockAccessListEntry</code> proto needs <code>repeated StringValue storage_reads</code> field</li>
+      <li><code>NewBlockAccessListFromGloas()</code> in <code>conversion.go</code> needs to iterate <code>access.StorageReads</code></li>
+      <li>Denormalized <code>BlockAccessListChange</code> needs <code>"storage_read"</code> change_type</li>
+      <li>ClickHouse table needs to handle <code>storage_read</code> rows</li>
+    </ul>
+    <div class="spec">Why: Essential for parallel execution analysis. <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">Spec &rarr;</a></div>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 2</div>
+    <h3>Sentry &mdash; Gloas Block Handling</h3>
+    <p>Update beacon block subscription handlers (<code>OnBlock</code>, <code>OnHead</code>) to handle <code>DataVersionGloas</code> blocks. Route to <code>NewEventBlockFromGloas</code>.</p>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 3</div>
+    <h3>Consumoor Routes</h3>
+    <p>Add BAL route handlers for consumoor (<code>canonical_beacon_block_access_list</code>).</p>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 4</div>
+    <h3>Engine API Tracking</h3>
+    <p>Update <code>consensus_engine_api_new_payload</code> event for V5 payload format:</p>
+    <ul>
+      <li><code>ExecutionPayloadV4</code> adds <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/blocks.py"><code>blockAccessList</code></a> (RLP) and <code>slotNumber</code> (uint64)</li>
+    </ul>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 5</div>
+    <h3>Block Access List Hash</h3>
+    <p>Capture the new <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/blocks.py"><code>block_access_list_hash</code></a> header field in:</p>
+    <ul>
+      <li><code>beacon_api_eth_v2_beacon_block</code> table</li>
+      <li><code>canonical_beacon_block</code> table</li>
+    </ul>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 6</div>
+    <h3>ethcore &mdash; eth/71 P2P Support</h3>
+    <p>ethcore's EL mimicry client needs <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a> message handlers for monitoring BAL propagation across the EL P2P network.</p>
+    <table>
+      <thead><tr><th>Message</th><th>ID</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>GetBlockAccessLists</code></td><td><code>0x12</code></td><td>Request BALs by block hashes</td></tr>
+        <tr><td><code>BlockAccessLists</code></td><td><code>0x13</code></td><td>Response with BAL data</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.8rem;color:var(--text2)">Soft response limit: 2 MiB. Validation: <code>keccak256(rlp(bal))</code> must match header hash.</p>
+  </div>
+
+  <div class="task">
+    <div class="num">Task 7</div>
+    <h3>xatu-cbt</h3>
+    <p>Deferred to follow-up.</p>
+  </div>
+</section>
+
+<!-- WHAT'S DONE -->
+<section>
+  <h2>What's Already Done</h2>
+  <details>
+    <summary>10 components complete on release/gloas <span class="pill pill-done">DONE</span></summary>
+    <div class="content">
+      <table>
+        <thead><tr><th>Component</th><th>Details</th></tr></thead>
+        <tbody>
+          <tr><td>Proto: <code>BlockAccessList</code>, <code>BlockAccessListEntry</code>, <code>BlockAccessListChange</code></td><td><code>eth/v1/block_access_list.proto</code></td></tr>
+          <tr><td>Proto: <code>BeaconBlockGloas</code>, <code>ExecutionPayloadGloas</code></td><td><code>eth/v2/beacon_block.proto</code>, <code>eth/v1/execution_engine.proto</code></td></tr>
+          <tr><td>Event type: <code>BEACON_API_ETH_V2_BEACON_BLOCK_ACCESS_LIST = 89</code></td><td><code>xatu/event_ingester.proto</code></td></tr>
+          <tr><td>Cannon deriver: <code>BlockAccessListDeriver</code></td><td><code>pkg/cannon/deriver/beacon/eth/v2/block_access_list.go</code></td></tr>
+          <tr><td>RLP decoding: <code>NewBlockAccessListFromGloas()</code></td><td><code>pkg/proto/eth/v1/conversion.go</code> (with tests)</td></tr>
+          <tr><td>Server event handler</td><td>Routes and validates BAL events</td></tr>
+          <tr><td>ClickHouse: <code>canonical_beacon_block_access_list</code></td><td>Migration 106</td></tr>
+          <tr><td>Vector pipeline</td><td>Kafka-to-ClickHouse routing</td></tr>
+          <tr><td>Block conversion: <code>NewEventBlockFromGloas()</code></td><td><code>pkg/proto/eth/block.go</code></td></tr>
+          <tr><td>Checkpoint/backfill support</td><td>Cannon location serialization</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- DEPS -->
+<section>
+  <h2>Upstream Dependencies</h2>
+  <table>
+    <thead><tr><th>Dependency</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>go-eth2-client</code> BALs</td><td><a href="https://github.com/pk910/go-eth2-client/pull/7">PR#7</a> &mdash; Open, using <code>go mod replace</code></td></tr>
+      <tr><td><code>go-ethereum</code> BALs</td><td>v1.17.1 <span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethcore</code> BALs RLP</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethcore</code> eth/71</td><td><span class="pill pill-todo">TODO</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+</body>
+</html>
