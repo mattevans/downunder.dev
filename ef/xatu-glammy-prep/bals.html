@@ -91,7 +91,7 @@ details .content p{font-size:0.85rem}
       <a href="bals.html" class="active">BALs</a>
       <a href="epbs.html">ePBS</a>
     </div>
-    <a href="glamsterdam_bals.md" class="raw">raw .md</a>
+    <a href="../glamsterdam_bals.md" class="raw">raw .md</a>
   </div>
 </nav>
 
@@ -105,62 +105,18 @@ details .content p{font-size:0.85rem}
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></span>
     <span class="tag"><a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">execution-specs</a></span>
   </div>
-  <div class="status-bar-big"><div class="fill" style="width:80%"></div></div>
-  <div class="pct">~80% complete &mdash; Core pipeline implemented. 7 tasks remaining.</div>
+  <div class="status-bar-big"><div class="fill" style="width:100%"></div></div>
+  <div class="pct">Spec-compliant &mdash; Verified against <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L198">AccountChanges spec</a>. All 6 fields + touched accounts captured.</div>
 </div>
 
 <!-- REMAINING WORK -->
 <section>
-  <h2>Remaining Work</h2>
+  <h2>Remaining Work (separate repos)</h2>
 
   <div class="task">
     <div class="num">Task 1</div>
-    <h3>Storage Reads &mdash; Proto + Conversion</h3>
-    <p>The BAL spec includes <code>storage_reads: List[StorageKey]</code> per account &mdash; slots accessed but not written. <strong>Not currently captured.</strong></p>
-    <ul>
-      <li><code>BlockAccessListEntry</code> proto needs <code>repeated StringValue storage_reads</code> field</li>
-      <li><code>NewBlockAccessListFromGloas()</code> in <code>conversion.go</code> needs to iterate <code>access.StorageReads</code></li>
-      <li>Denormalized <code>BlockAccessListChange</code> needs <code>"storage_read"</code> change_type</li>
-      <li>ClickHouse table needs to handle <code>storage_read</code> rows</li>
-    </ul>
-    <div class="spec">Why: Essential for parallel execution analysis. <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">Spec &rarr;</a></div>
-  </div>
-
-  <div class="task">
-    <div class="num">Task 2</div>
-    <h3>Sentry &mdash; Gloas Block Handling</h3>
-    <p>Update beacon block subscription handlers (<code>OnBlock</code>, <code>OnHead</code>) to handle <code>DataVersionGloas</code> blocks. Route to <code>NewEventBlockFromGloas</code>.</p>
-  </div>
-
-  <div class="task">
-    <div class="num">Task 3</div>
-    <h3>Consumoor Routes</h3>
-    <p>Add BAL route handlers for consumoor (<code>canonical_beacon_block_access_list</code>).</p>
-  </div>
-
-  <div class="task">
-    <div class="num">Task 4</div>
-    <h3>Engine API Tracking</h3>
-    <p>Update <code>consensus_engine_api_new_payload</code> event for V5 payload format:</p>
-    <ul>
-      <li><code>ExecutionPayloadV4</code> adds <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/blocks.py"><code>blockAccessList</code></a> (RLP) and <code>slotNumber</code> (uint64)</li>
-    </ul>
-  </div>
-
-  <div class="task">
-    <div class="num">Task 5</div>
-    <h3>Block Access List Hash</h3>
-    <p>Capture the new <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/blocks.py"><code>block_access_list_hash</code></a> header field in:</p>
-    <ul>
-      <li><code>beacon_api_eth_v2_beacon_block</code> table</li>
-      <li><code>canonical_beacon_block</code> table</li>
-    </ul>
-  </div>
-
-  <div class="task">
-    <div class="num">Task 6</div>
     <h3>ethcore &mdash; eth/71 P2P Support</h3>
-    <p>ethcore's EL mimicry client needs <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a> message handlers for monitoring BAL propagation across the EL P2P network.</p>
+    <p>ethcore's EL mimicry client needs <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a> message handlers for monitoring BAL propagation across the EL P2P network. <strong>Separate repo.</strong></p>
     <table>
       <thead><tr><th>Message</th><th>ID</th><th>Description</th></tr></thead>
       <tbody>
@@ -168,35 +124,54 @@ details .content p{font-size:0.85rem}
         <tr><td><code>BlockAccessLists</code></td><td><code>0x13</code></td><td>Response with BAL data</td></tr>
       </tbody>
     </table>
-    <p style="font-size:0.8rem;color:var(--text2)">Soft response limit: 2 MiB. Validation: <code>keccak256(rlp(bal))</code> must match header hash.</p>
   </div>
 
   <div class="task">
-    <div class="num">Task 7</div>
+    <div class="num">Task 2</div>
     <h3>xatu-cbt</h3>
     <p>Deferred to follow-up.</p>
   </div>
 </section>
 
+<!-- CHANGE TYPES -->
+<section>
+  <h2>Change Types in ClickHouse</h2>
+  <table>
+    <thead><tr><th><code>change_type</code></th><th>Description</th><th><code>storage_key</code></th><th><code>block_access_index</code></th><th><code>new_value</code></th></tr></thead>
+    <tbody>
+      <tr><td><code>storage</code></td><td>Storage slot write</td><td>Set</td><td>Set</td><td>Set</td></tr>
+      <tr><td><code>storage_read</code></td><td>Read-only slot (<a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L218">spec</a>)</td><td>Set</td><td>&mdash;</td><td>&mdash;</td></tr>
+      <tr><td><code>balance</code></td><td>Balance change</td><td>&mdash;</td><td>Set</td><td>Set</td></tr>
+      <tr><td><code>nonce</code></td><td>Nonce change</td><td>&mdash;</td><td>Set</td><td>Set</td></tr>
+      <tr><td><code>code</code></td><td>Code deployment/change</td><td>&mdash;</td><td>Set</td><td>Set</td></tr>
+      <tr><td><code>touched</code></td><td>Accessed, not modified (<a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L529">spec</a>)</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    </tbody>
+  </table>
+</section>
+
 <!-- WHAT'S DONE -->
 <section>
-  <h2>What's Already Done</h2>
-  <details>
-    <summary>10 components complete on release/gloas <span class="pill pill-done">DONE</span></summary>
+  <h2>What's Done</h2>
+  <details open>
+    <summary>Full pipeline complete on release/gloas <span class="pill pill-done">SPEC COMPLIANT</span></summary>
     <div class="content">
       <table>
         <thead><tr><th>Component</th><th>Details</th></tr></thead>
         <tbody>
           <tr><td>Proto: <code>BlockAccessList</code>, <code>BlockAccessListEntry</code>, <code>BlockAccessListChange</code></td><td><code>eth/v1/block_access_list.proto</code></td></tr>
+          <tr><td>Proto: <code>BlockAccessListStorageRead</code></td><td>Typed message for read-only slots</td></tr>
           <tr><td>Proto: <code>BeaconBlockGloas</code>, <code>ExecutionPayloadGloas</code></td><td><code>eth/v2/beacon_block.proto</code>, <code>eth/v1/execution_engine.proto</code></td></tr>
           <tr><td>Event type: <code>BEACON_API_ETH_V2_BEACON_BLOCK_ACCESS_LIST = 89</code></td><td><code>xatu/event_ingester.proto</code></td></tr>
-          <tr><td>Cannon deriver: <code>BlockAccessListDeriver</code></td><td><code>pkg/cannon/deriver/beacon/eth/v2/block_access_list.go</code></td></tr>
-          <tr><td>RLP decoding: <code>NewBlockAccessListFromGloas()</code></td><td><code>pkg/proto/eth/v1/conversion.go</code> (with tests)</td></tr>
+          <tr><td>Cannon deriver: all 6 change types + <code>touched</code></td><td><code>pkg/cannon/deriver/beacon/eth/v2/block_access_list.go</code></td></tr>
+          <tr><td>RLP decoding + <code>storage_reads</code></td><td><code>pkg/proto/eth/v1/conversion.go</code> (with tests)</td></tr>
+          <tr><td>Sentry: Gloas block handling</td><td><code>DataVersionGloas</code> in version switch</td></tr>
+          <tr><td>Consumoor: BAL route</td><td><code>canonical_beacon_block_access_list.go</code></td></tr>
           <tr><td>Server event handler</td><td>Routes and validates BAL events</td></tr>
-          <tr><td>ClickHouse: <code>canonical_beacon_block_access_list</code></td><td>Migration 106</td></tr>
+          <tr><td>ClickHouse: table + <code>block_access_list_root</code></td><td>Migration 106</td></tr>
           <tr><td>Vector pipeline</td><td>Kafka-to-ClickHouse routing</td></tr>
           <tr><td>Block conversion: <code>NewEventBlockFromGloas()</code></td><td><code>pkg/proto/eth/block.go</code></td></tr>
           <tr><td>Checkpoint/backfill support</td><td>Cannon location serialization</td></tr>
+          <tr><td>Deps aligned</td><td><code>go-ethereum</code>, <code>ethcore</code>, <code>beacon</code> all on latest <code>bal-devnet-3</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -210,8 +185,9 @@ details .content p{font-size:0.85rem}
     <thead><tr><th>Dependency</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td><code>go-eth2-client</code> BALs</td><td><a href="https://github.com/pk910/go-eth2-client/pull/7">PR#7</a> &mdash; Open, using <code>go mod replace</code></td></tr>
-      <tr><td><code>go-ethereum</code> BALs</td><td>v1.17.1 <span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>ethcore</code> BALs RLP</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>go-ethereum</code> BALs</td><td>v1.17.2-0.20260324 (latest <code>bal-devnet-3</code>) <span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethcore</code> BALs RLP</td><td>Aligned with go-ethereum <span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>beacon</code></td><td>Aligned with go-ethereum <span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>ethcore</code> eth/71</td><td><span class="pill pill-todo">TODO</span></td></tr>
     </tbody>
   </table>
