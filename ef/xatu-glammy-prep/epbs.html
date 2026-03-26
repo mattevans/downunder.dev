@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; Proto types defined &mdash; sentry/cannon blocked on upstream</div>
+  <div class="sub">EIP-7732 &mdash; Internal plumbing complete &mdash; sentry/cannon/TYSM remain</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -123,7 +123,7 @@ details .content p{font-size:0.85rem}
 <!-- PROTO TYPES -->
 <section>
   <h2>Proto Types <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All 13 ePBS protobuf messages defined across 5 new files. Verified against <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas">Gloas consensus specs</a>. 10 event type IDs registered (90&ndash;99). <code>buf lint</code> + <code>buf build</code> pass.</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All ePBS protobuf types defined: 5 new eth/v1 files, 4 libp2p gossipsub types, 10 event IDs (90&ndash;99), 10 Additional*Data messages (ClientMeta fields 96&ndash;105), 2 CannonType entries + location persistence. <code>BeaconBlockBodyGloas</code> is additive (old + new fields coexist).</p>
 
   <table style="margin-bottom:1.5rem">
     <thead><tr><th>File</th><th>Types</th><th>Spec</th></tr></thead>
@@ -385,10 +385,10 @@ details .content p{font-size:0.85rem}
       </table>
     </div>
   </div>
-  <h3>Server / Event Ingester</h3>
-  <p>Register all new event types in router. New handlers + persistence/location for new cannon types.</p>
-  <h3>Vector Pipeline</h3>
-  <p>New routing rules, VRL transforms, ClickHouse sink configurations for each new event type.</p>
+  <h3>Server / Event Ingester <span class="pill pill-done">DONE</span></h3>
+  <p>10 event handlers + router registration. Cannon location persistence (CannonType 17&ndash;18 + Marshal/Unmarshal + backfilling iterator). 10 Additional*Data proto messages wired up in consumoor routes (not zero-filled). Existing beacon block routes append NULL for 4 new ePBS columns. Data column sidecar routes append NULL for new Gloas columns.</p>
+  <h3>Vector Pipeline <span class="pill pill-todo">TODO</span></h3>
+  <p>Consumoor replaces Vector for new events. YAML config not critical.</p>
 </section>
 
 <!-- TYSM -->
