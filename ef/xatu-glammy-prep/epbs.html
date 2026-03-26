@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; Status: Planning (blocked on upstream)</div>
+  <div class="sub">EIP-7732 &mdash; Proto types defined &mdash; sentry/cannon blocked on upstream</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -122,10 +122,22 @@ details .content p{font-size:0.85rem}
 
 <!-- PROTO TYPES -->
 <section>
-  <h2>New Proto Types to Define</h2>
+  <h2>Proto Types <span class="pill pill-done">DONE</span></h2>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All 13 ePBS protobuf messages defined across 5 new files. Verified against <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas">Gloas consensus specs</a>. 10 event type IDs registered (90&ndash;99). <code>buf lint</code> + <code>buf build</code> pass.</p>
+
+  <table style="margin-bottom:1.5rem">
+    <thead><tr><th>File</th><th>Types</th><th>Spec</th></tr></thead>
+    <tbody>
+      <tr><td><code>eth/v1/payload_attestation.proto</code></td><td>PayloadAttestationData, PayloadAttestationMessage, PayloadAttestation, IndexedPayloadAttestation</td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#payloadattestationdata">spec</a></td></tr>
+      <tr><td><code>eth/v1/execution_payload_bid.proto</code></td><td>ExecutionPayloadBid, SignedExecutionPayloadBid</td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadbid">spec</a></td></tr>
+      <tr><td><code>eth/v1/execution_payload_envelope.proto</code></td><td>ExecutionPayloadEnvelope, SignedExecutionPayloadEnvelope</td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadenvelope">spec</a></td></tr>
+      <tr><td><code>eth/v1/builder.proto</code></td><td>Builder</td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#builder">spec</a></td></tr>
+      <tr><td><code>eth/v1/proposer_preferences.proto</code></td><td>ProposerPreferences, SignedProposerPreferences</td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#new-proposerpreferences">spec</a></td></tr>
+    </tbody>
+  </table>
 
   <details open>
-    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadbid" style="color:var(--white)">ExecutionPayloadBid</a> <span class="pill pill-new">NEW</span></summary>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadbid" style="color:var(--white)">ExecutionPayloadBid</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
 <pre><span class="kw">class</span> <span class="type">ExecutionPayloadBid</span>(Container):
     parent_block_hash: Hash32
@@ -147,7 +159,7 @@ details .content p{font-size:0.85rem}
   </details>
 
   <details>
-    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadenvelope" style="color:var(--white)">ExecutionPayloadEnvelope</a> <span class="pill pill-new">NEW</span></summary>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#executionpayloadenvelope" style="color:var(--white)">ExecutionPayloadEnvelope</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
 <pre><span class="kw">class</span> <span class="type">ExecutionPayloadEnvelope</span>(Container):
     payload: ExecutionPayload
@@ -164,7 +176,7 @@ details .content p{font-size:0.85rem}
   </details>
 
   <details>
-    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#payloadattestationdata" style="color:var(--white)">PayloadAttestation (PTC)</a> <span class="pill pill-new">NEW</span></summary>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#payloadattestationdata" style="color:var(--white)">PayloadAttestation (PTC)</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
 <pre><span class="kw">class</span> <span class="type">PayloadAttestationData</span>(Container):
     beacon_block_root: Root
@@ -190,7 +202,7 @@ details .content p{font-size:0.85rem}
   </details>
 
   <details>
-    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#builder" style="color:var(--white)">Builder</a> + <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#new-proposerpreferences" style="color:var(--white)">ProposerPreferences</a> <span class="pill pill-new">NEW</span></summary>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#builder" style="color:var(--white)">Builder</a> + <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#new-proposerpreferences" style="color:var(--white)">ProposerPreferences</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
 <pre><span class="kw">class</span> <span class="type">Builder</span>(Container):
     pubkey: BLSPubkey
@@ -213,10 +225,10 @@ details .content p{font-size:0.85rem}
   </details>
 
   <details>
-    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#beaconblockbody" style="color:var(--white)">Modified BeaconBlockBody</a> <span class="pill pill-mod">MODIFIED</span></summary>
+    <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#beaconblockbody" style="color:var(--white)">Modified BeaconBlockBody</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
-      <p><strong>Removed:</strong> <code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code></p>
-      <p><strong>Added:</strong> <code>signed_execution_payload_bid</code>, <code>payload_attestations: List[PayloadAttestation, 4]</code></p>
+      <p><strong>Removed</strong> (reserved fields 10, 12, 13): <code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code></p>
+      <p><strong>Added:</strong> <code>signed_execution_payload_bid</code> (field 14), <code>payload_attestations: List[PayloadAttestation, 4]</code> (field 15)</p>
     </div>
   </details>
 </section>
