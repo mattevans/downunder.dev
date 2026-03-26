@@ -318,24 +318,41 @@ details .content p{font-size:0.85rem}
 
 <!-- CLICKHOUSE -->
 <section>
-  <h2>New ClickHouse Tables</h2>
+  <h2>ClickHouse Tables <span class="pill pill-done">DONE</span></h2>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>107_gloas_epbs_support</code>: 10 new tables + column additions.</p>
+  <h3>Cannon (from finalized blocks)</h3>
   <table>
     <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
     <tbody>
-      <tr><td><code>canonical_beacon_block_payload_attestation</code></td><td>slot, beacon_block_root, aggregation_bits, payload_present, blob_data_available, attesting_validator_count</td></tr>
-      <tr><td><code>canonical_beacon_block_execution_payload_bid</code></td><td>slot, builder_index, block_hash, parent_block_hash, parent_block_root, value, execution_payment, fee_recipient, gas_limit, blob_commitment_count</td></tr>
-      <tr><td><code>beacon_api_eth_v1_events_execution_payload</code></td><td>slot, block_root, builder_index, execution_payload_hash, arrival_time</td></tr>
-      <tr><td><code>libp2p_..._execution_payload_envelope</code></td><td>slot, builder_index, block_root, propagation_time</td></tr>
-      <tr><td><code>libp2p_..._payload_attestation_message</code></td><td>slot, validator_index, beacon_block_root, payload_present, blob_data_available</td></tr>
-      <tr><td><code>libp2p_..._execution_payload_bid</code></td><td>slot, builder_index, block_hash, value, execution_payment</td></tr>
-      <tr><td><code>libp2p_..._proposer_preferences</code></td><td>slot, validator_index, fee_recipient, gas_limit</td></tr>
+      <tr><td><code>canonical_beacon_block_payload_attestation</code></td><td>slot, block_root, position, payload_present, blob_data_available, attesting_validator_count</td></tr>
+      <tr><td><code>canonical_beacon_block_execution_payload_bid</code></td><td>slot, block_root, builder_index, block_hash, value, execution_payment, fee_recipient</td></tr>
+    </tbody>
+  </table>
+  <h3>Sentry SSE (beacon API real-time)</h3>
+  <table>
+    <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>beacon_api_eth_v1_events_execution_payload</code></td><td>slot, block_root, builder_index, block_hash, propagation_slot_start_diff</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_payload_attestation</code></td><td>slot, beacon_block_root, validator_index, payload_present, blob_data_available</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_execution_payload_bid</code></td><td>slot, builder_index, block_hash, value, execution_payment, fee_recipient</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_proposer_preferences</code></td><td>slot, validator_index, fee_recipient, gas_limit</td></tr>
+    </tbody>
+  </table>
+  <h3>LibP2P Gossip (P2P propagation)</h3>
+  <table>
+    <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>libp2p_gossipsub_execution_payload_envelope</code></td><td>slot, block_root, builder_index, peer_id, message_id</td></tr>
+      <tr><td><code>libp2p_gossipsub_execution_payload_bid</code></td><td>slot, builder_index, block_hash, value, peer_id, message_id</td></tr>
+      <tr><td><code>libp2p_gossipsub_payload_attestation_message</code></td><td>slot, validator_index, beacon_block_root, peer_id, message_id</td></tr>
+      <tr><td><code>libp2p_gossipsub_proposer_preferences</code></td><td>slot, validator_index, fee_recipient, peer_id, message_id</td></tr>
     </tbody>
   </table>
   <h3>Modified Tables</h3>
   <table>
     <tbody>
       <tr><td><code>beacon_api_eth_v2_beacon_block</code> / <code>canonical_beacon_block</code></td><td>+ <code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code></td></tr>
-      <tr><td>DataColumnSidecar tables</td><td>+ <code>slot</code> (Nullable), <code>beacon_block_root</code> (Nullable)</td></tr>
+      <tr><td>DataColumnSidecar tables (sentry + libp2p)</td><td>+ <code>sidecar_slot</code>, <code>sidecar_beacon_block_root</code> (Nullable, NULL for Fulu)</td></tr>
     </tbody>
   </table>
 </section>
