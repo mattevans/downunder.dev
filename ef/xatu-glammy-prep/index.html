@@ -196,15 +196,15 @@ section:nth-child(8){animation-delay:0.35s}
       <div class="label">EIP-7928 + EIP-8159</div>
       <h3><a href="bals.html">Block-Level Access Lists</a></h3>
       <div class="eip"><a href="https://eips.ethereum.org/EIPS/eip-7928">EIP-7928</a> &middot; <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></div>
-      <div class="status-bar"><div class="fill fill-green" style="width:98%"></div></div>
-      <div class="pct">Spec-compliant &mdash; one <code>block_access_index</code> uint16/uint32 type mismatch to fix; ethcore eth/71 + xatu-cbt remain</div>
+      <div class="status-bar"><div class="fill fill-green" style="width:100%"></div></div>
+      <div class="pct">Spec-compliant &mdash; in-repo work complete; ethcore eth/71 + xatu-cbt remain in separate repos</div>
     </div>
     <div class="status-card">
       <div class="label">EIP-7732</div>
       <h3><a href="epbs.html">Enshrined Proposer-Builder Separation</a></h3>
       <div class="eip"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></div>
-      <div class="status-bar"><div class="fill fill-green" style="width:85%"></div></div>
-      <div class="pct">Sentry + cannon + server all wired &mdash; CL mimicry producers, cannon iterator backfill, snapshot fixtures remain</div>
+      <div class="status-bar"><div class="fill fill-green" style="width:88%"></div></div>
+      <div class="pct">Sentry + cannon (incl. backfilling iterator) + server all wired &mdash; CL mimicry producers, snapshot fixtures remain</div>
     </div>
   </div>
 </section>
@@ -303,7 +303,7 @@ section:nth-child(8){animation-delay:0.35s}
   <details>
     <summary>New Cannon Derived Events (from finalized blocks) <span class="pill pill-done">3 derivers wired</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Derivers wired in <code>pkg/cannon/cannon.go</code>. <code>CannonType</code> enum entries 16/17/18 added with Marshal/Unmarshal. Backfilling-iterator <code>createLocationFromEpochNumber</code> wiring still <code>TODO(epbs)</code> in <code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Derivers wired in <code>pkg/cannon/cannon.go</code>. <code>CannonType</code> enum entries 16/17/18 added with Marshal/Unmarshal. Backfilling iterator (<code>GetMarker</code> + <code>createLocationFromEpochNumber</code> in <code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>) handles all three new types.</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th></tr></thead>
         <tbody>

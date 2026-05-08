@@ -105,19 +105,13 @@ details .content p{font-size:0.85rem}
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></span>
     <span class="tag"><a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">execution-specs</a></span>
   </div>
-  <div class="status-bar-big"><div class="fill" style="width:98%"></div></div>
-  <div class="pct">Spec-compliant &mdash; Verified against <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L198">AccountChanges spec</a>. All 6 fields + touched accounts captured. <strong>One real test failure</strong>: <code>block_access_index</code> is declared <code>UInt16</code> in migration <code>002_gloas_bals_support.up.sql:35</code> but tests expect <code>uint32</code> &mdash; small fix.</div>
+  <div class="status-bar-big"><div class="fill" style="width:100%"></div></div>
+  <div class="pct">Spec-compliant &mdash; Verified against <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L198">AccountChanges spec</a>. All 6 fields + touched accounts captured. <code>block_access_index</code> column widened to <code>UInt32</code> per <a href="https://eips.ethereum.org/EIPS/eip-7928">EIP-7928</a>; in-repo work complete.</div>
 </div>
 
 <!-- REMAINING WORK -->
 <section>
   <h2>Remaining Work</h2>
-
-  <div class="task" style="border-left-color:var(--red)">
-    <div class="num">Bug fix &mdash; in xatu</div>
-    <h3><code>block_access_index</code> column type mismatch</h3>
-    <p>Migration <code>002_gloas_bals_support.up.sql:35</code> declares <code>block_access_index UInt16</code>; the snapshot test in <code>pkg/clickhouse/route/canonical/canonical_beacon_block_access_list_test.go</code> (and the <code>_balance</code> variant) fails with <em>expected <code>uint32(0x5)</code>, got <code>uint16(0x5)</code></em>. Pick one and align proto/route code.</p>
-  </div>
 
   <div class="task">
     <div class="num">Task 1 &mdash; separate repo</div>

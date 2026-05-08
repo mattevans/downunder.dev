@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; Sentry, cannon &amp; server wired &mdash; CL mimicry producers, iterator backfill, snapshot fixtures remain &middot; Updated 2026-05-08</div>
+  <div class="sub">EIP-7732 &mdash; Sentry, cannon (incl. backfilling iterator) &amp; server wired &mdash; CL mimicry producers, snapshot fixtures remain &middot; Updated 2026-05-08</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -253,8 +253,8 @@ details .content p{font-size:0.85rem}
       </table>
     </div>
     <div>
-      <h3>Cannon Derived <span class="pill pill-done">DERIVERS WIRED</span></h3>
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Wired in <code>pkg/cannon/cannon.go</code>. Backfilling-iterator wiring still <code>TODO(epbs)</code>.</p>
+      <h3>Cannon Derived <span class="pill pill-done">WIRED</span></h3>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Wired in <code>pkg/cannon/cannon.go</code>. Backfilling iterator handles CannonType 17/18 in both <code>GetMarker</code> and <code>createLocationFromEpochNumber</code>.</p>
       <table>
         <tbody>
           <tr><td><code>..._BLOCK_PAYLOAD_ATTESTATION</code></td><td><code>NewPayloadAttestationDeriver</code></td></tr>
@@ -394,7 +394,7 @@ details .content p{font-size:0.85rem}
           <tr><td><span class="pill pill-done">DONE</span></td><td><code>BlockAccessList</code> deriver (BAL track)</td></tr>
           <tr><td><span class="pill pill-done">DONE</span></td><td><code>PayloadAttestation</code> deriver</td></tr>
           <tr><td><span class="pill pill-done">DONE</span></td><td><code>ExecutionPayloadBid</code> deriver</td></tr>
-          <tr><td><span class="pill pill-todo">TODO</span></td><td>Backfilling iterator wiring for CannonType 17/18 (<code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>)</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td>Backfilling iterator wiring for CannonType 17/18 (<code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>)</td></tr>
           <tr><td><span class="pill pill-todo">TODO</span></td><td><code>ExecutionTransaction</code> &mdash; source from envelope (envelope arrival side)</td></tr>
         </tbody>
       </table>
@@ -470,7 +470,6 @@ details .content p{font-size:0.85rem}
     <thead><tr><th>Item</th><th>Where</th><th>Priority</th></tr></thead>
     <tbody>
       <tr><td>CL mimicry gossipsub producers (4 topics)</td><td><code>pkg/clmimicry/</code></td><td><span class="pill pill-p0">P0</span></td></tr>
-      <tr><td>Backfilling iterator wiring for CannonType 17/18</td><td><code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code></td><td><span class="pill pill-p1">P1</span></td></tr>
       <tr><td>Snapshot test fixtures (10 placeholder tests)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
       <tr><td>TYSM ePBS hooks (5 events)</td><td>separate repo</td><td><span class="pill pill-p1">P1</span></td></tr>
       <tr><td>Cannon <code>ExecutionTransaction</code> &amp; <code>BlockAccessList</code> &mdash; envelope-arrival side</td><td><code>pkg/cannon/deriver/beacon/eth/v2/</code></td><td><span class="pill pill-p1">P1</span> &mdash; depends on devnet</td></tr>
