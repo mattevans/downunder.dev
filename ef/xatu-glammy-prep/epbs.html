@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; Internal plumbing complete &mdash; sentry/cannon/TYSM remain</div>
+  <div class="sub">EIP-7732 &mdash; Sentry, cannon &amp; server wired &mdash; CL mimicry producers, iterator backfill, snapshot fixtures remain &middot; Updated 2026-05-08</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -123,7 +123,7 @@ details .content p{font-size:0.85rem}
 <!-- PROTO TYPES -->
 <section>
   <h2>Proto Types <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All ePBS protobuf types defined: 5 new eth/v1 files, 4 libp2p gossipsub types, 10 event IDs (90&ndash;99), 10 Additional*Data messages (ClientMeta fields 96&ndash;105), 2 CannonType entries + location persistence. <code>BeaconBlockBodyGloas</code> is additive (old + new fields coexist).</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All ePBS protobuf types defined: 6 new eth/v1 files (incl. <code>execution_payload_available.proto</code>), 4 libp2p gossipsub summary types, 12 event IDs (90&ndash;101), 12 Additional*Data messages, 3 CannonType entries (16&ndash;18) + location persistence, <code>ForkChoiceNodeV2.payload_status</code> (field 10) round-tripping via <code>extra_data</code>. <code>BeaconBlockBodyGloas</code> is additive (old + new fields coexist).</p>
 
   <table style="margin-bottom:1.5rem">
     <thead><tr><th>File</th><th>Types</th><th>Spec</th></tr></thead>
@@ -235,32 +235,36 @@ details .content p{font-size:0.85rem}
 
 <!-- NEW EVENTS -->
 <section>
-  <h2>New Events to Implement</h2>
+  <h2>New Events &mdash; Status by Track</h2>
   <div class="cols">
     <div>
-      <h3>Sentry SSE (real-time)</h3>
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Core Gloas SSE events are already in the <a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml">beacon-APIs spec</a>, merged via <a href="https://github.com/ethereum/beacon-APIs/pull/552">PR#552</a>. We just need to implement sentry handlers.</p>
+      <h3>Sentry SSE (real-time) <span class="pill pill-done">WIRED</span></h3>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">All six handlers live in <code>pkg/sentry/event/beacon/eth/v1/</code> + callbacks in <code>pkg/sentry/sentry.go</code>. Unblocked by the combined ethpandaops/go-eth2-client fork.</p>
       <table>
-        <thead><tr><th>Event</th><th>Description</th><th><a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml">beacon-APIs</a></th></tr></thead>
+        <thead><tr><th>Event</th><th>Sentry Callback</th></tr></thead>
         <tbody>
-          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Verified payload + blob availability</td><td><code>execution_payload_available</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
-          <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td>Individual PTC (~512/slot)</td><td><code>payload_attestation_message</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
-          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td>All builder bids</td><td><code>execution_payload_bid</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
-          <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td>Proposer preferences</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a> in-flight</td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td><code>OnExecutionPayload</code></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_GOSSIP</code></td><td><code>OnExecutionPayloadGossip</code></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_AVAILABLE</code></td><td><code>OnExecutionPayloadAvailable</code></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td><code>OnExecutionPayloadBid</code></td></tr>
+          <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td><code>OnPayloadAttestationMessage</code></td></tr>
+          <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td><code>OnProposerPreferences</code></td></tr>
         </tbody>
       </table>
     </div>
     <div>
-      <h3>Cannon Derived (from finalized blocks)</h3>
+      <h3>Cannon Derived <span class="pill pill-done">DERIVERS WIRED</span></h3>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Wired in <code>pkg/cannon/cannon.go</code>. Backfilling-iterator wiring still <code>TODO(epbs)</code>.</p>
       <table>
         <tbody>
-          <tr><td><code>..._BLOCK_PAYLOAD_ATTESTATION</code></td><td>Aggregated PTC from block (max 4)</td></tr>
-          <tr><td><code>..._BLOCK_EXECUTION_PAYLOAD_BID</code></td><td>Winning bid from block (1/block)</td></tr>
+          <tr><td><code>..._BLOCK_PAYLOAD_ATTESTATION</code></td><td><code>NewPayloadAttestationDeriver</code></td></tr>
+          <tr><td><code>..._BLOCK_EXECUTION_PAYLOAD_BID</code></td><td><code>NewExecutionPayloadBidDeriver</code></td></tr>
         </tbody>
       </table>
     </div>
   </div>
-  <h3>P2P Gossip (CL mimicry)</h3>
+  <h3>P2P Gossip (CL mimicry) <span class="pill pill-todo">PRODUCERS TODO</span></h3>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Server-side handlers (<code>pkg/server/.../libp2p/trace_gossipsub_*.go</code>) and ClickHouse routes already exist. The producer side &mdash; new dispatchers in <code>pkg/clmimicry/</code> &mdash; is the gap. Existing CL mimicry covers beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar / single_attestation; ePBS topics need adding alongside.</p>
   <table>
     <thead><tr><th>Event</th><th>Gossip Topic</th><th>Spec</th></tr></thead>
     <tbody>
@@ -290,22 +294,24 @@ details .content p{font-size:0.85rem}
     </div>
   </details>
   <details>
-    <summary>Attestation Events &mdash; Index Semantic Change <span class="pill pill-mod">MODIFIED</span></summary>
+    <summary>Attestation Events &mdash; Index Semantic Change <span class="pill pill-done">NO-OP</span></summary>
     <div class="content">
       <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#beacon_aggregate_and_proof">Index field repurposed</a>: <code>0</code> = same-slot / payload not present, <code>1</code> = payload present.</p>
+      <p><strong>Decision:</strong> No new column. The raw <code>data.index</code> is already stored in <code>committee_index</code> on attestation tables; consumers can derive the 0/1 payload-availability flag from that for Gloas+ rows. The spec uses <code>state.execution_payload_availability</code>, not a per-attestation column name we'd be matching.</p>
     </div>
   </details>
   <details>
-    <summary>DataColumnSidecar &mdash; Structural Change <span class="pill pill-mod">MODIFIED</span></summary>
+    <summary>DataColumnSidecar &mdash; Structural Change <span class="pill pill-info">DEFERRED</span></summary>
     <div class="content">
       <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#modified-datacolumnsidecar">Removed</a>: <code>signed_block_header</code>, <code>kzg_commitments</code>, <code>kzg_commitments_inclusion_proof</code>. Added: <code>slot</code>, <code>beacon_block_root</code>.</p>
-      <p><strong>Approach:</strong> Additive only. New columns, NULL for Fulu rows.</p>
+      <p><strong>Status:</strong> The two preemptive projection columns (<code>sidecar_slot</code>, <code>sidecar_beacon_block_root</code>) added to <code>beacon_api_eth_v1_events_data_column_sidecar</code> and the matching libp2p table were <strong>reverted</strong>. We'll wait for real Gloas SSE payloads before deciding which fields to project, instead of guessing field names that may not match what producers actually emit.</p>
     </div>
   </details>
   <details>
-    <summary>Fork Choice Dumps <span class="pill pill-mod">MODIFIED</span></summary>
+    <summary>Fork Choice Dumps <span class="pill pill-done">DONE</span></summary>
     <div class="content">
-      <p>Tracks <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork-choice.md#types"><code>PayloadStatus</code></a> per node: EMPTY (0), FULL (1), PENDING (2). New Store fields: <code>payload_states</code>, <code>payload_timeliness_vote</code>, <code>payload_data_availability_vote</code>.</p>
+      <p>Tracks <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork-choice.md#types"><code>PayloadStatus</code></a> per node: EMPTY (0), FULL (1), PENDING (2).</p>
+      <p><strong>Done:</strong> <code>ForkChoiceNodeV2.payload_status</code> proto field (10) added; <code>fork_choice.go</code> round-trips it via <code>extra_data["payload_status"]</code> with the helper <code>payloadStatusFromExtraData</code> tolerating both string ("EMPTY"/"FULL"/"PENDING") and numeric (0/1/2) shapes.</p>
     </div>
   </details>
   <details>
@@ -319,7 +325,7 @@ details .content p{font-size:0.85rem}
 <!-- CLICKHOUSE -->
 <section>
   <h2>ClickHouse Tables <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>107_gloas_epbs_support</code>: 10 new tables + column additions.</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>003_gloas_epbs_support</code> (renumbered from 107 after master squashed historical migrations into <code>001_init.up.sql</code>): <strong>12 new tables</strong> + column additions to existing beacon block tables.</p>
   <h3>Cannon (from finalized blocks)</h3>
   <table>
     <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
@@ -333,6 +339,8 @@ details .content p{font-size:0.85rem}
     <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
     <tbody>
       <tr><td><code>beacon_api_eth_v1_events_execution_payload</code></td><td>slot, block_root, builder_index, block_hash, propagation_slot_start_diff</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_execution_payload_gossip</code></td><td>gossip-receipt timing for payload</td></tr>
+      <tr><td><code>beacon_api_eth_v1_events_execution_payload_available</code></td><td>verified payload + blob availability</td></tr>
       <tr><td><code>beacon_api_eth_v1_events_payload_attestation</code></td><td>slot, beacon_block_root, validator_index, payload_present, blob_data_available</td></tr>
       <tr><td><code>beacon_api_eth_v1_events_execution_payload_bid</code></td><td>slot, builder_index, block_hash, value, execution_payment, fee_recipient</td></tr>
       <tr><td><code>beacon_api_eth_v1_events_proposer_preferences</code></td><td>slot, validator_index, fee_recipient, gas_limit</td></tr>
@@ -352,9 +360,12 @@ details .content p{font-size:0.85rem}
   <table>
     <tbody>
       <tr><td><code>beacon_api_eth_v2_beacon_block</code> / <code>canonical_beacon_block</code></td><td>+ <code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code></td></tr>
-      <tr><td>DataColumnSidecar tables (sentry + libp2p)</td><td>+ <code>sidecar_slot</code>, <code>sidecar_beacon_block_root</code> (Nullable, NULL for Fulu)</td></tr>
+      <tr><td><code>canonical_beacon_block_withdrawal</code></td><td>builder withdrawals via <code>BUILDER_INDEX_FLAG = 2^40</code></td></tr>
+      <tr><td>DataColumnSidecar tables (sentry + libp2p)</td><td><span class="pill pill-info">REVERTED</span> &mdash; preemptive <code>sidecar_slot</code>/<code>sidecar_beacon_block_root</code> projection columns dropped; revisit when real Gloas SSE payloads arrive</td></tr>
     </tbody>
   </table>
+  <h3 style="margin-top:1rem">Snapshot tests <span class="pill pill-todo">TODO(epbs)</span></h3>
+  <p style="font-size:0.82rem;color:var(--text2)">10 placeholder snapshot tests across <code>pkg/clickhouse/route/{beacon,canonical,libp2p}</code> currently fail with <em>"nil &hellip; payload: invalid event"</em> &mdash; awaiting real Gloas devnet fixtures.</p>
 </section>
 
 <!-- COMPONENT CHANGES -->
@@ -362,33 +373,39 @@ details .content p{font-size:0.85rem}
   <h2>Component Changes</h2>
   <div class="cols">
     <div>
-      <h3>Sentry</h3>
+      <h3>Sentry <span class="pill pill-done">DONE</span></h3>
+      <p style="font-size:0.78rem;color:var(--text2);margin-bottom:0.5rem">Six new SSE callbacks wired in <code>pkg/sentry/sentry.go</code>; six handler files in <code>pkg/sentry/event/beacon/eth/v1/</code>.</p>
       <table>
         <tbody>
-          <tr><td><span class="pill pill-new">NEW</span></td><td><code>OnExecutionPayload</code> subscription</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>OnBlock</code> &mdash; handle Gloas blocks</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td>Block version detection for Gloas</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnExecutionPayload</code></td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnExecutionPayloadGossip</code></td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnExecutionPayloadAvailable</code></td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnExecutionPayloadBid</code></td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnPayloadAttestationMessage</code></td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>OnProposerPreferences</code></td></tr>
         </tbody>
       </table>
     </div>
     <div>
-      <h3>Cannon Derivers</h3>
+      <h3>Cannon Derivers <span class="pill pill-done">WIRED</span></h3>
+      <p style="font-size:0.78rem;color:var(--text2);margin-bottom:0.5rem">Three new derivers in <code>pkg/cannon/deriver/beacon/eth/v2/</code> wired in <code>pkg/cannon/cannon.go</code>; <code>CannonType</code> entries 16/17/18 added.</p>
       <table>
         <tbody>
-          <tr><td><span class="pill pill-new">NEW</span></td><td><code>PayloadAttestation</code> deriver</td></tr>
-          <tr><td><span class="pill pill-new">NEW</span></td><td><code>ExecutionPayloadBid</code> deriver</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>BeaconBlock</code> &mdash; no inline payload</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>ExecutionTransaction</code> &mdash; from envelope</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>Withdrawal</code> &mdash; from envelope + builders</td></tr>
-          <tr><td><span class="pill pill-mod">MOD</span></td><td><code>BlockAccessList</code> &mdash; from envelope</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>BlockAccessList</code> deriver (BAL track)</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>PayloadAttestation</code> deriver</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>ExecutionPayloadBid</code> deriver</td></tr>
+          <tr><td><span class="pill pill-todo">TODO</span></td><td>Backfilling iterator wiring for CannonType 17/18 (<code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>)</td></tr>
+          <tr><td><span class="pill pill-todo">TODO</span></td><td><code>ExecutionTransaction</code> &mdash; source from envelope (envelope arrival side)</td></tr>
         </tbody>
       </table>
     </div>
   </div>
   <h3>Server / Event Ingester <span class="pill pill-done">DONE</span></h3>
-  <p>10 event handlers + router registration. Cannon location persistence (CannonType 17&ndash;18 + Marshal/Unmarshal + backfilling iterator). 10 Additional*Data proto messages wired up in consumoor routes (not zero-filled). Existing beacon block routes append NULL for 4 new ePBS columns. Data column sidecar routes append NULL for new Gloas columns.</p>
-  <h3>Vector Pipeline <span class="pill pill-todo">TODO</span></h3>
-  <p>Consumoor replaces Vector for new events. YAML config not critical.</p>
+  <p>12 event handlers (incl. new <code>events_execution_payload_gossip</code> + <code>events_execution_payload_available</code>) + router registration. Master merge renamed <code>pkg/consumoor/route/</code> &rarr; <code>pkg/clickhouse/route/</code>. Cannon location persistence: CannonType 16&ndash;18 + Marshal/Unmarshal. 12 Additional*Data proto messages wired up in routes. Existing beacon block routes append NULL for the four new ePBS columns.</p>
+  <h3>CL Mimicry <span class="pill pill-todo">TODO &mdash; producer side</span></h3>
+  <p>Server-side handlers and ClickHouse routes for the four ePBS gossipsub topics already exist. New producer dispatchers in <code>pkg/clmimicry/</code> are needed to actually emit them &mdash; the existing CL mimicry covers beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar / single_attestation; ePBS topics need adding alongside.</p>
+  <h3>Vector Pipeline <span class="pill pill-info">N/A</span></h3>
+  <p>Consumoor (now <code>pkg/clickhouse/</code>) replaces Vector for new events. YAML config not critical.</p>
 </section>
 
 <!-- TYSM -->
@@ -435,13 +452,29 @@ details .content p{font-size:0.85rem}
 <section>
   <h2>Upstream Dependencies</h2>
   <table>
-    <thead><tr><th>Dependency</th><th>Status</th><th>Blocker?</th></tr></thead>
+    <thead><tr><th>Dependency</th><th>Pinned at</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><code>go-eth2-client</code> ePBS</td><td><a href="https://github.com/pk910/go-eth2-client/pull/4">PR#4</a> &mdash; Open</td><td><span class="pill pill-blocked">BLOCKS SENTRY+CANNON</span></td></tr>
-      <tr><td><code>go-eth2-client</code> combined</td><td>Not started</td><td><span class="pill pill-blocked">BLOCKED</span></td></tr>
-      <tr><td><code>go-ethereum</code> ePBS</td><td>TBD</td><td>Unknown</td></tr>
-      <tr><td><code>ethcore</code> ePBS</td><td>TBD</td><td>Unknown</td></tr>
-      <tr><td><code>tysm</code> Gloas hooks</td><td>Architecture ready</td><td><span class="pill pill-done">NO &mdash; WE CONTROL</span></td></tr>
+      <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2-0.20260507042554-4e9992fe2f0e</code></td><td><span class="pill pill-done">DONE</span> &mdash; combined BAL+ePBS fork</td></tr>
+      <tr><td><code>go-ethereum</code></td><td><code>v1.17.2-0.20260324190457-8f361e342cb9</code></td><td><span class="pill pill-done">DONE</span> &mdash; bal-devnet-3</td></tr>
+      <tr><td><code>ethpandaops/ethcore</code></td><td><code>v0.0.0-20260508010718-193cc4aa5947</code></td><td><span class="pill pill-done">DONE</span> &mdash; merged BAL + eth/68/69/70</td></tr>
+      <tr><td><code>ethpandaops/beacon</code></td><td><code>v0.67.1-0.20260507052247-b31a645f6e36</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>tysm</code> Gloas hooks</td><td>Architecture ready</td><td><span class="pill pill-todo">TODO</span> &mdash; we control</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- REMAINING WORK -->
+<section>
+  <h2>Remaining Work</h2>
+  <table>
+    <thead><tr><th>Item</th><th>Where</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td>CL mimicry gossipsub producers (4 topics)</td><td><code>pkg/clmimicry/</code></td><td><span class="pill pill-p0">P0</span></td></tr>
+      <tr><td>Backfilling iterator wiring for CannonType 17/18</td><td><code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code></td><td><span class="pill pill-p1">P1</span></td></tr>
+      <tr><td>Snapshot test fixtures (10 placeholder tests)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
+      <tr><td>TYSM ePBS hooks (5 events)</td><td>separate repo</td><td><span class="pill pill-p1">P1</span></td></tr>
+      <tr><td>Cannon <code>ExecutionTransaction</code> &amp; <code>BlockAccessList</code> &mdash; envelope-arrival side</td><td><code>pkg/cannon/deriver/beacon/eth/v2/</code></td><td><span class="pill pill-p1">P1</span> &mdash; depends on devnet</td></tr>
+      <tr><td>Beacon API <code>head_v2</code> + <code>chain_reorg</code> field updates</td><td>sentry handler</td><td><span class="pill pill-info">in-flight upstream</span></td></tr>
     </tbody>
   </table>
 </section>

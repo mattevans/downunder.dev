@@ -99,24 +99,30 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>BALs</span> &mdash; Block-Level Access Lists</h1>
-  <div class="sub">EIP-7928 + EIP-8159 (eth/71) &mdash; Branch: release/gloas</div>
+  <div class="sub">EIP-7928 + EIP-8159 (eth/71) &mdash; Branch: release/gloas &middot; Updated 2026-05-08</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7928">EIP-7928</a></span>
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></span>
     <span class="tag"><a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py">execution-specs</a></span>
   </div>
-  <div class="status-bar-big"><div class="fill" style="width:100%"></div></div>
-  <div class="pct">Spec-compliant &mdash; Verified against <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L198">AccountChanges spec</a>. All 6 fields + touched accounts captured.</div>
+  <div class="status-bar-big"><div class="fill" style="width:98%"></div></div>
+  <div class="pct">Spec-compliant &mdash; Verified against <a href="https://github.com/ethereum/execution-specs/blob/forks/amsterdam/src/ethereum/forks/amsterdam/block_access_lists.py#L198">AccountChanges spec</a>. All 6 fields + touched accounts captured. <strong>One real test failure</strong>: <code>block_access_index</code> is declared <code>UInt16</code> in migration <code>002_gloas_bals_support.up.sql:35</code> but tests expect <code>uint32</code> &mdash; small fix.</div>
 </div>
 
 <!-- REMAINING WORK -->
 <section>
-  <h2>Remaining Work (separate repos)</h2>
+  <h2>Remaining Work</h2>
+
+  <div class="task" style="border-left-color:var(--red)">
+    <div class="num">Bug fix &mdash; in xatu</div>
+    <h3><code>block_access_index</code> column type mismatch</h3>
+    <p>Migration <code>002_gloas_bals_support.up.sql:35</code> declares <code>block_access_index UInt16</code>; the snapshot test in <code>pkg/clickhouse/route/canonical/canonical_beacon_block_access_list_test.go</code> (and the <code>_balance</code> variant) fails with <em>expected <code>uint32(0x5)</code>, got <code>uint16(0x5)</code></em>. Pick one and align proto/route code.</p>
+  </div>
 
   <div class="task">
-    <div class="num">Task 1</div>
+    <div class="num">Task 1 &mdash; separate repo</div>
     <h3>ethcore &mdash; eth/71 P2P Support</h3>
-    <p>ethcore's EL mimicry client needs <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a> message handlers for monitoring BAL propagation across the EL P2P network. <strong>Separate repo. Deferred</strong> &mdash; go-ethereum does not have eth/71 protocol types yet.</p>
+    <p>ethcore's EL mimicry client needs <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a> message handlers for monitoring BAL propagation across the EL P2P network. <strong>Deferred</strong> &mdash; go-ethereum does not have eth/71 protocol types yet (no <code>ETH71</code>, <code>GetBlockAccessListsMsg</code>, <code>BlockAccessListsMsg</code>).</p>
     <table>
       <thead><tr><th>Message</th><th>ID</th><th>Description</th></tr></thead>
       <tbody>
@@ -127,7 +133,7 @@ details .content p{font-size:0.85rem}
   </div>
 
   <div class="task">
-    <div class="num">Task 2</div>
+    <div class="num">Task 2 &mdash; separate repo</div>
     <h3>xatu-cbt</h3>
     <p>Deferred to follow-up.</p>
   </div>
@@ -165,13 +171,12 @@ details .content p{font-size:0.85rem}
           <tr><td>Cannon deriver: all 6 change types + <code>touched</code></td><td><code>pkg/cannon/deriver/beacon/eth/v2/block_access_list.go</code></td></tr>
           <tr><td>RLP decoding + <code>storage_reads</code></td><td><code>pkg/proto/eth/v1/conversion.go</code> (with tests)</td></tr>
           <tr><td>Sentry: Gloas block handling</td><td><code>DataVersionGloas</code> in version switch</td></tr>
-          <tr><td>Consumoor: BAL route</td><td><code>canonical_beacon_block_access_list.go</code></td></tr>
+          <tr><td>ClickHouse route: BAL</td><td><code>pkg/clickhouse/route/canonical/canonical_beacon_block_access_list.go</code></td></tr>
           <tr><td>Server event handler</td><td>Routes and validates BAL events</td></tr>
-          <tr><td>ClickHouse: table + <code>block_access_list_root</code></td><td>Migration 106</td></tr>
-          <tr><td>Vector pipeline</td><td>Kafka-to-ClickHouse routing</td></tr>
+          <tr><td>ClickHouse: table + <code>execution_payload_block_access_list_root</code></td><td>Migration <code>002_gloas_bals_support</code></td></tr>
           <tr><td>Block conversion: <code>NewEventBlockFromGloas()</code></td><td><code>pkg/proto/eth/block.go</code></td></tr>
-          <tr><td>Checkpoint/backfill support</td><td>Cannon location serialization</td></tr>
-          <tr><td>Deps aligned</td><td><code>go-ethereum</code>, <code>ethcore</code>, <code>beacon</code> all on latest <code>bal-devnet-3</code></td></tr>
+          <tr><td>Checkpoint/backfill support</td><td>CannonType 16 + location serialization</td></tr>
+          <tr><td>Deps aligned</td><td>go-ethereum bal-devnet-3, ethcore merged-master, beacon, ethpandaops/go-eth2-client combined fork</td></tr>
         </tbody>
       </table>
     </div>
@@ -182,13 +187,13 @@ details .content p{font-size:0.85rem}
 <section>
   <h2>Upstream Dependencies</h2>
   <table>
-    <thead><tr><th>Dependency</th><th>Status</th></tr></thead>
+    <thead><tr><th>Dependency</th><th>Pinned at</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><code>go-eth2-client</code> BALs</td><td><a href="https://github.com/pk910/go-eth2-client/pull/7">PR#7</a> &mdash; Open, using <code>go mod replace</code></td></tr>
-      <tr><td><code>go-ethereum</code> BALs</td><td>v1.17.2-0.20260324 (latest <code>bal-devnet-3</code>) <span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>ethcore</code> BALs RLP</td><td>Aligned with go-ethereum <span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>beacon</code></td><td>Aligned with go-ethereum <span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>ethcore</code> eth/71</td><td><span class="pill pill-blocked">DEFERRED</span> go-ethereum lacks eth/71 types</td></tr>
+      <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2-0.20260507042554-4e9992fe2f0e</code></td><td><span class="pill pill-done">DONE</span> combined BAL+ePBS fork</td></tr>
+      <tr><td><code>go-ethereum</code></td><td><code>v1.17.2-0.20260324190457-8f361e342cb9</code></td><td><span class="pill pill-done">DONE</span> bal-devnet-3</td></tr>
+      <tr><td><code>ethpandaops/ethcore</code></td><td><code>v0.0.0-20260508010718-193cc4aa5947</code></td><td><span class="pill pill-done">DONE</span> merged BAL + eth/68/69/70</td></tr>
+      <tr><td><code>ethpandaops/beacon</code></td><td><code>v0.67.1-0.20260507052247-b31a645f6e36</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethcore</code> eth/71</td><td>n/a</td><td><span class="pill pill-blocked">DEFERRED</span> go-ethereum lacks eth/71 types</td></tr>
     </tbody>
   </table>
 </section>

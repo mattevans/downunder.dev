@@ -185,7 +185,7 @@ section:nth-child(8){animation-delay:0.35s}
     <span class="tag">Fork Version <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork.md#configuration">0x07000000</a></span>
     <span class="tag">Specs <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas">consensus</a> / <a href="https://github.com/ethereum/execution-specs/tree/forks/amsterdam">execution</a></span>
     <span class="tag">Repos <a href="https://github.com/ethpandaops/xatu">xatu</a> / <a href="https://github.com/ethpandaops/tysm">tysm</a></span>
-    <span class="tag">Updated 2026-03-26</span>
+    <span class="tag">Updated 2026-05-08</span>
   </div>
 </div>
 
@@ -196,15 +196,15 @@ section:nth-child(8){animation-delay:0.35s}
       <div class="label">EIP-7928 + EIP-8159</div>
       <h3><a href="bals.html">Block-Level Access Lists</a></h3>
       <div class="eip"><a href="https://eips.ethereum.org/EIPS/eip-7928">EIP-7928</a> &middot; <a href="https://eips.ethereum.org/EIPS/eip-8159">EIP-8159</a></div>
-      <div class="status-bar"><div class="fill fill-green" style="width:100%"></div></div>
-      <div class="pct">Spec-compliant &mdash; ethcore eth/71 + xatu-cbt remain (separate repos)</div>
+      <div class="status-bar"><div class="fill fill-green" style="width:98%"></div></div>
+      <div class="pct">Spec-compliant &mdash; one <code>block_access_index</code> uint16/uint32 type mismatch to fix; ethcore eth/71 + xatu-cbt remain</div>
     </div>
     <div class="status-card">
       <div class="label">EIP-7732</div>
       <h3><a href="epbs.html">Enshrined Proposer-Builder Separation</a></h3>
       <div class="eip"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></div>
-      <div class="status-bar"><div class="fill fill-amber" style="width:45%"></div></div>
-      <div class="pct">Internal plumbing complete + audited &mdash; blocked on go-eth2-client for sentry/cannon</div>
+      <div class="status-bar"><div class="fill fill-green" style="width:85%"></div></div>
+      <div class="pct">Sentry + cannon + server all wired &mdash; CL mimicry producers, cannon iterator backfill, snapshot fixtures remain</div>
     </div>
   </div>
 </section>
@@ -246,26 +246,28 @@ section:nth-child(8){animation-delay:0.35s}
 <section>
   <h2>Beacon API SSE — <a href="https://github.com/ethereum/beacon-APIs">ethereum/beacon-APIs</a></h2>
   <details open>
-    <summary>Already in spec (<a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml" style="color:var(--accent)">eventstream/index.yaml</a>) <span class="pill pill-done">3 events</span></summary>
+    <summary>Sentry SSE handlers wired in <code>pkg/sentry/sentry.go</code> <span class="pill pill-done">6 handlers</span></summary>
     <div class="content">
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">All six SSE callbacks live: <code>OnExecutionPayload</code>, <code>OnExecutionPayloadGossip</code>, <code>OnExecutionPayloadAvailable</code>, <code>OnExecutionPayloadBid</code>, <code>OnPayloadAttestationMessage</code>, <code>OnProposerPreferences</code>. Now unblocked by the ethpandaops fork of go-eth2-client carrying combined BAL+ePBS.</p>
       <table>
-        <thead><tr><th>SSE Topic</th><th>Description</th></tr></thead>
+        <thead><tr><th>SSE Topic</th><th>Xatu Event</th></tr></thead>
         <tbody>
-          <tr><td><code>execution_payload_available</code></td><td>Node verified execution payload + blobs availability for payload attestation</td></tr>
-          <tr><td><code>execution_payload_bid</code></td><td>Node received a <code>SignedExecutionPayloadBid</code> passing gossip validation</td></tr>
-          <tr><td><code>payload_attestation_message</code></td><td>Node received a <code>PayloadAttestationMessage</code> passing validation</td></tr>
+          <tr><td><code>execution_payload</code></td><td><code>..._EVENTS_EXECUTION_PAYLOAD</code> (90)</td></tr>
+          <tr><td><code>execution_payload_gossip</code></td><td><code>..._EVENTS_EXECUTION_PAYLOAD_GOSSIP</code> (100)</td></tr>
+          <tr><td><code>execution_payload_available</code></td><td><code>..._EVENTS_EXECUTION_PAYLOAD_AVAILABLE</code> (101)</td></tr>
+          <tr><td><code>execution_payload_bid</code></td><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code> (92)</td></tr>
+          <tr><td><code>payload_attestation_message</code></td><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code> (91)</td></tr>
+          <tr><td><code>proposer_preferences</code></td><td><code>..._EVENTS_PROPOSER_PREFERENCES</code> (93)</td></tr>
         </tbody>
       </table>
     </div>
   </details>
   <details>
-    <summary>In-flight PRs (open) <span class="pill pill-info">5 PRs</span></summary>
+    <summary>Other in-flight PRs to track <span class="pill pill-info">3 PRs</span></summary>
     <div class="content">
       <table>
         <thead><tr><th>Event</th><th>PR</th><th>Author</th></tr></thead>
         <tbody>
-          <tr><td><code>execution_payload_gossip</code> (timing)</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/588">#588</a></td><td>nflaig</td></tr>
-          <tr><td><code>proposer_preferences</code> SSE + pool</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a></td><td>bharath-123</td></tr>
           <tr><td><code>head_v2</code> (deprecates <code>head</code>)</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/590">#590</a></td><td>chong-he</td></tr>
           <tr><td><code>chain_reorg</code> + exec block hashes</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/585">#585</a></td><td>bharath-123</td></tr>
           <tr><td>PTC duty endpoint</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/592">#592</a></td><td>nflaig</td></tr>
@@ -281,27 +283,31 @@ section:nth-child(8){animation-delay:0.35s}
   <h2>Event Inventory</h2>
 
   <details open>
-    <summary>New Sentry SSE Events (real-time) <span class="pill pill-done">4 events</span></summary>
+    <summary>New Sentry SSE Events (real-time) <span class="pill pill-done">6 events &mdash; wired</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">The core Gloas SSE events have already been proposed and merged into the <a href="https://github.com/ethereum/beacon-APIs/blob/master/apis/eventstream/index.yaml">beacon-APIs spec</a> via <a href="https://github.com/ethereum/beacon-APIs/pull/552">PR#552</a>. We just need to implement sentry handlers.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">All sentry handlers live in <code>pkg/sentry/event/beacon/eth/v1/</code> and registered via callbacks in <code>pkg/sentry/sentry.go</code>. Snapshot fixtures for the ClickHouse routes are <code>TODO(epbs)</code> placeholders awaiting Gloas devnet data.</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th><th>beacon-APIs</th></tr></thead>
         <tbody>
-          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Verified payload + blob availability</td><td><code>execution_payload_available</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD</code></td><td>Generic execution_payload SSE</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_AVAILABLE</code></td><td>Verified payload + blob availability</td><td><code>execution_payload_available</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
+          <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_GOSSIP</code></td><td>Gossip-receipt timing for payload</td><td><code>execution_payload_gossip</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/588">#588</a></td></tr>
           <tr><td><code>..._EVENTS_PAYLOAD_ATTESTATION</code></td><td>Individual PTC (~512/slot)</td><td><code>payload_attestation_message</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
           <tr><td><code>..._EVENTS_EXECUTION_PAYLOAD_BID</code></td><td>All builder bids</td><td><code>execution_payload_bid</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/552">#552</a></td></tr>
-          <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td>Proposer preferences</td><td><a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a> <span class="pill pill-info">IN-FLIGHT</span></td></tr>
+          <tr><td><code>..._EVENTS_PROPOSER_PREFERENCES</code></td><td>Proposer preferences</td><td><code>proposer_preferences</code> &mdash; <a href="https://github.com/ethereum/beacon-APIs/pull/593">#593</a></td></tr>
         </tbody>
       </table>
     </div>
   </details>
 
   <details>
-    <summary>New Cannon Derived Events (from finalized blocks) <span class="pill pill-todo">2 events</span></summary>
+    <summary>New Cannon Derived Events (from finalized blocks) <span class="pill pill-done">3 derivers wired</span></summary>
     <div class="content">
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Derivers wired in <code>pkg/cannon/cannon.go</code>. <code>CannonType</code> enum entries 16/17/18 added with Marshal/Unmarshal. Backfilling-iterator <code>createLocationFromEpochNumber</code> wiring still <code>TODO(epbs)</code> in <code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>.</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th></tr></thead>
         <tbody>
+          <tr><td><code>..._BLOCK_ACCESS_LIST</code></td><td>BALs from block (BAL track) &mdash; <span class="pill pill-done">DONE</span></td></tr>
           <tr><td><code>..._BLOCK_PAYLOAD_ATTESTATION</code></td><td>Aggregated PTC from block (max 4)</td></tr>
           <tr><td><code>..._BLOCK_EXECUTION_PAYLOAD_BID</code></td><td>Winning bid from block (1/block)</td></tr>
         </tbody>
@@ -310,8 +316,9 @@ section:nth-child(8){animation-delay:0.35s}
   </details>
 
   <details>
-    <summary>New P2P Gossip Events (CL mimicry) <span class="pill pill-todo">4 events</span></summary>
+    <summary>New P2P Gossip Events (CL mimicry) <span class="pill pill-todo">4 events &mdash; producer side TODO</span></summary>
     <div class="content">
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Server-side handlers and ClickHouse routes for these four events are wired up. The <strong>producer</strong> side &mdash; new gossip dispatchers in <code>pkg/clmimicry/</code> &mdash; is the remaining gap.</p>
       <table>
         <thead><tr><th>Event</th><th>Gossip Topic</th></tr></thead>
         <tbody>
@@ -325,23 +332,23 @@ section:nth-child(8){animation-delay:0.35s}
   </details>
 
   <details>
-    <summary>Modified Events <span class="pill pill-info">13 events</span></summary>
+    <summary>Modified Events <span class="pill pill-info">12 events</span></summary>
     <div class="content">
       <table>
-        <thead><tr><th>Event</th><th>Change</th></tr></thead>
+        <thead><tr><th>Event</th><th>Change</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td><code>ETH_V2_BEACON_BLOCK</code></td><td>Block body has bid instead of execution_payload</td></tr>
-          <tr><td><code>ETH_V2_..._EXECUTION_TRANSACTION</code></td><td>Source from envelope</td></tr>
-          <tr><td><code>ETH_V2_..._WITHDRAWAL</code></td><td>Source from envelope + builder withdrawals via <code>BUILDER_INDEX_FLAG</code></td></tr>
-          <tr><td><code>ETH_V1_EVENTS_BLOCK</code></td><td>Block arrives before payload</td></tr>
-          <tr><td><code>ETH_V1_EVENTS_HEAD</code></td><td><code>head_v2</code> replaces <code>head</code> (<a href="https://github.com/ethereum/beacon-APIs/pull/590">#590</a>)</td></tr>
-          <tr><td><code>ETH_V1_EVENTS_CHAIN_REORG</code></td><td>Adds execution block hashes — payload reorgs possible (<a href="https://github.com/ethereum/beacon-APIs/pull/585">#585</a>)</td></tr>
-          <tr><td><code>ETH_V1_EVENTS_ATTESTATION</code></td><td>Index field: 0=no payload, 1=payload present</td></tr>
-          <tr><td><code>ETH_V2_..._ACCESS_LIST</code></td><td>BAL in envelope, not block body</td></tr>
-          <tr><td><code>CONSENSUS_ENGINE_API_NEW_PAYLOAD</code></td><td>V5 format</td></tr>
-          <tr><td><code>ETH_V1_DEBUG_FORK_CHOICE</code></td><td>PayloadStatus (EMPTY/FULL/PENDING) + PTC votes</td></tr>
-          <tr><td><code>ETH_V1_EVENTS_DATA_COLUMN_SIDECAR</code></td><td>Structural change (additive columns)</td></tr>
-          <tr><td><code>GOSSIPSUB_DATA_COLUMN_SIDECAR</code></td><td>Structural change (additive columns)</td></tr>
+          <tr><td><code>ETH_V2_BEACON_BLOCK</code></td><td>Block body has bid instead of execution_payload; +<code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code> columns</td><td><span class="pill pill-done">migrated</span></td></tr>
+          <tr><td><code>ETH_V2_..._EXECUTION_TRANSACTION</code></td><td>Source from envelope</td><td><span class="pill pill-todo">deriver</span></td></tr>
+          <tr><td><code>ETH_V2_..._WITHDRAWAL</code></td><td>Source from envelope + builder withdrawals via <code>BUILDER_INDEX_FLAG</code></td><td><span class="pill pill-done">migrated</span></td></tr>
+          <tr><td><code>ETH_V1_EVENTS_BLOCK</code></td><td>Block arrives before payload</td><td><span class="pill pill-todo">runtime</span></td></tr>
+          <tr><td><code>ETH_V1_EVENTS_HEAD</code></td><td><code>head_v2</code> replaces <code>head</code> (<a href="https://github.com/ethereum/beacon-APIs/pull/590">#590</a>)</td><td><span class="pill pill-info">in-flight</span></td></tr>
+          <tr><td><code>ETH_V1_EVENTS_CHAIN_REORG</code></td><td>Adds execution block hashes &mdash; payload reorgs possible (<a href="https://github.com/ethereum/beacon-APIs/pull/585">#585</a>)</td><td><span class="pill pill-info">in-flight</span></td></tr>
+          <tr><td><code>ETH_V1_EVENTS_ATTESTATION</code></td><td>Index repurposed: 0=EMPTY/same-slot, 1=payload-present. Raw value already stored in <code>committee_index</code> &mdash; no new column added.</td><td><span class="pill pill-done">no-op</span></td></tr>
+          <tr><td><code>ETH_V2_..._ACCESS_LIST</code></td><td>BAL in envelope, not block body</td><td><span class="pill pill-todo">deriver</span></td></tr>
+          <tr><td><code>CONSENSUS_ENGINE_API_NEW_PAYLOAD</code></td><td>V5 format</td><td><span class="pill pill-todo">tysm</span></td></tr>
+          <tr><td><code>ETH_V1_DEBUG_FORK_CHOICE</code></td><td><code>payload_status</code> (EMPTY/FULL/PENDING) on <code>ForkChoiceNodeV2</code> &mdash; round-trips via <code>extra_data</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+          <tr><td><code>ETH_V1_EVENTS_DATA_COLUMN_SIDECAR</code></td><td>Structural change (slot/beacon_block_root). Projection columns <strong>reverted</strong> &mdash; will be revisited when real Gloas SSE payloads arrive.</td><td><span class="pill pill-info">deferred</span></td></tr>
+          <tr><td><code>GOSSIPSUB_DATA_COLUMN_SIDECAR</code></td><td>Same as above</td><td><span class="pill pill-info">deferred</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -350,19 +357,21 @@ section:nth-child(8){animation-delay:0.35s}
 
 <!-- OPEN QUESTIONS -->
 <section>
-  <h2>Open Questions</h2>
+  <h2>Open Questions &amp; Recently Answered</h2>
   <div class="question"><div class="cat">Architecture</div><p><strong>Block-Payload Correlation:</strong> How do we correlate beacon blocks with separately-arriving execution payloads in ClickHouse? Same slot + block_root? Denormalize? Dedicated timeline table?</p></div>
-  <div class="question"><div class="cat">Architecture</div><p><strong>Empty Block Handling:</strong> When builder withholds payload &mdash; NULL execution payload fields? Explicit <code>payload_status</code> column? Both?</p></div>
-  <div class="question"><div class="cat">Architecture</div><p><strong>BAL Source under ePBS:</strong> Does beacon node reassemble a "complete" block once both pieces arrive, or must cannon deriver separately fetch the envelope?</p></div>
+  <div class="question"><div class="cat">Architecture</div><p><strong>Empty Block Handling:</strong> When builder withholds payload &mdash; NULL execution payload fields? Explicit <code>payload_status</code> column? Both? <em>Partial answer:</em> <code>payload_present</code> flag landed on beacon_block tables; payload_status on fork-choice nodes.</p></div>
+  <div class="question" style="border-left-color:var(--accent)"><div class="cat" style="color:var(--accent)">Answered</div><p><strong>Attestation index column:</strong> No new <code>payload_vote</code> projection &mdash; <code>committee_index</code> already stores raw <code>data.index</code>; consumers can derive 0/1 for Gloas+ rows. Spec doesn't introduce a name we'd be matching anyway.</p></div>
+  <div class="question" style="border-left-color:var(--accent)"><div class="cat" style="color:var(--accent)">Answered</div><p><strong>DataColumnSidecar projection columns:</strong> Reverted &mdash; will revisit when real Gloas SSE payloads arrive instead of guessing field names.</p></div>
   <div class="question"><div class="cat">Data Model</div><p><strong>Builder vs Validator withdrawals:</strong> Separate tables or <code>withdrawal_type</code> column?</p></div>
 </section>
 
 <!-- UPSTREAM DEPS -->
 <section>
   <h2>Upstream Dependencies</h2>
-  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status">BALs: <a href="https://github.com/pk910/go-eth2-client/pull/7">PR#7</a> (Open) &middot; ePBS: <a href="https://github.com/pk910/go-eth2-client/pull/4">PR#4</a> (Open) &middot; Combined: <span class="pill pill-blocked">NOT STARTED</span></span></div>
-  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status">BALs: v1.17.1 <span class="pill pill-done">DONE</span> &middot; ePBS: TBD</span></div>
-  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status">RLP: <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types) &middot; ePBS: TBD</span></div>
+  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status"><code>ethpandaops/go-eth2-client v0.1.2-0.20260507042554-4e9992fe2f0e</code> &mdash; combined BAL+ePBS fork <span class="pill pill-done">DONE</span></span></div>
+  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status"><code>v1.17.2-0.20260324190457-8f361e342cb9</code> (BAL fork, latest <code>bal-devnet-3</code>) <span class="pill pill-done">DONE</span> &middot; ePBS EL: not required server-side</span></div>
+  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status"><code>v0.0.0-20260508010718-193cc4aa5947</code> &mdash; merged BAL+eth/68/69/70 branch <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types)</span></div>
+  <div class="dep-row"><span class="dep-name">beacon</span><span class="dep-status"><code>ethpandaops/beacon v0.67.1-0.20260507052247-b31a645f6e36</code> <span class="pill pill-done">DONE</span></span></div>
   <div class="dep-row"><span class="dep-name">tysm</span><span class="dep-status">Gloas hooks: <span class="pill pill-todo">TODO</span> &mdash; architecture ready, no external deps</span></div>
 </section>
 
@@ -375,8 +384,8 @@ section:nth-child(8){animation-delay:0.35s}
     <a href="https://eips.ethereum.org/EIPS/eip-8159" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">EIP-8159: eth/71</a>
     <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">consensus-specs/gloas</a>
     <a href="https://github.com/ethereum/execution-specs/tree/forks/amsterdam/src/ethereum/forks/amsterdam" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">execution-specs/amsterdam</a>
-    <a href="https://github.com/pk910/go-eth2-client/pull/7" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">go-eth2-client BALs PR</a>
-    <a href="https://github.com/pk910/go-eth2-client/pull/4" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">go-eth2-client ePBS PR</a>
+    <a href="https://github.com/ethpandaops/go-eth2-client" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">ethpandaops/go-eth2-client (combined fork)</a>
+    <a href="https://github.com/ethpandaops/ethcore" class="tag" style="font-family:var(--mono);font-size:0.75rem;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;color:var(--accent);text-decoration:none">ethpandaops/ethcore</a>
   </div>
 </section>
 
