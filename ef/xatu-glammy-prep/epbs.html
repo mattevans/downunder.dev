@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; Sentry, cannon (incl. backfilling iterator) &amp; server wired &mdash; CL mimicry producers, snapshot fixtures remain &middot; Updated 2026-05-08</div>
+  <div class="sub">EIP-7732 &mdash; Sentry, cannon, server, CL mimicry producers, &amp; <strong>TYSM ePBS observe hooks (end-to-end)</strong> all wired &mdash; 10 snapshot fixtures (depend on Gloas devnet) + sentry Gloas devnet verification remain &middot; Updated 2026-05-13</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -123,7 +123,7 @@ details .content p{font-size:0.85rem}
 <!-- PROTO TYPES -->
 <section>
   <h2>Proto Types <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All ePBS protobuf types defined: 6 new eth/v1 files (incl. <code>execution_payload_available.proto</code>), 4 libp2p gossipsub summary types, 12 event IDs (90&ndash;101), 12 Additional*Data messages, 3 CannonType entries (16&ndash;18) + location persistence, <code>ForkChoiceNodeV2.payload_status</code> (field 10) round-tripping via <code>extra_data</code>. <code>BeaconBlockBodyGloas</code> is additive (old + new fields coexist).</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">All ePBS protobuf types defined: 6 new eth/v1 files (incl. <code>execution_payload_available.proto</code>), 4 libp2p gossipsub summary types, 12 event IDs (90&ndash;101) + 2 synthetic (102&ndash;103), 14 Additional*Data messages, 3 CannonType entries (16&ndash;18) + location persistence, <code>ForkChoiceNodeV2.payload_status</code> (field 10) round-tripping via <code>extra_data</code>. <code>BeaconBlockBodyGloas</code> is <strong>fork-specific</strong> — pre-ePBS fields (<code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code>) are spec-removed and not on the proto; fields 10/11/12/13 carry <code>bls_to_execution_changes</code> / <code>signed_execution_payload_bid</code> / <code>payload_attestations</code> / <code>parent_execution_requests</code> (deferred-processing per consensus-specs <a href="https://github.com/ethereum/consensus-specs/pull/5094">PR #5094</a>).</p>
 
   <table style="margin-bottom:1.5rem">
     <thead><tr><th>File</th><th>Types</th><th>Spec</th></tr></thead>
@@ -227,8 +227,9 @@ details .content p{font-size:0.85rem}
   <details>
     <summary><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md#beaconblockbody" style="color:var(--white)">Modified BeaconBlockBody</a> <span class="pill pill-done">DONE</span></summary>
     <div class="content">
-      <p><strong>Removed</strong> (reserved fields 10, 12, 13): <code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code></p>
-      <p><strong>Added:</strong> <code>signed_execution_payload_bid</code> (field 14), <code>payload_attestations: List[PayloadAttestation, 4]</code> (field 15)</p>
+      <p><strong>Removed from Gloas body</strong>: <code>execution_payload</code>, <code>blob_kzg_commitments</code>, <code>execution_requests</code> — these move to the envelope / bid under EIP-7732.</p>
+      <p><strong>Added to Gloas body:</strong> <code>signed_execution_payload_bid</code>, <code>payload_attestations: List[PayloadAttestation, 4]</code>, <code>parent_execution_requests</code> (deferred-processing from consensus-specs <a href="https://github.com/ethereum/consensus-specs/pull/5094">PR #5094</a>).</p>
+      <p style="font-size:0.78rem;color:var(--text3);margin-top:0.5rem"><strong>Proto:</strong> <code>BeaconBlockBodyGloas</code> is fork-specific (no cross-fork instance ever carries both shapes), so we make the spec-correct change rather than treating field positions as reserved. Field assignment: 10=<code>bls_to_execution_changes</code>, 11=<code>signed_execution_payload_bid</code>, 12=<code>payload_attestations</code>, 13=<code>parent_execution_requests</code>.</p>
     </div>
   </details>
 </section>
@@ -263,17 +264,19 @@ details .content p{font-size:0.85rem}
       </table>
     </div>
   </div>
-  <h3>P2P Gossip (CL mimicry) <span class="pill pill-todo">PRODUCERS TODO</span></h3>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Server-side handlers (<code>pkg/server/.../libp2p/trace_gossipsub_*.go</code>) and ClickHouse routes already exist. The producer side &mdash; new dispatchers in <code>pkg/clmimicry/</code> &mdash; is the gap. Existing CL mimicry covers beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar / single_attestation; ePBS topics need adding alongside.</p>
+  <h3>P2P Gossip (CL mimicry) <span class="pill pill-done">WIRED</span></h3>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Producer dispatch in <code>pkg/clmimicry/</code> wired (2026-05-12) alongside existing beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar / single_attestation handlers. Each handler mirrors <code>gossipsub_blob_sidecar.go</code>: builds the gossipsub summary proto, attaches <code>AdditionalData</code> (wallclock / propagation diff / peer_id / message_id), emits a <code>DecoratedEvent</code>. <code>New*Payload(...)</code> builders in <code>payload_builders.go</code> are the API TYSM will call from prysm gossip-validation hooks.</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem"><strong>Bug fix in the same change:</strong> <code>mapGossipSubEventToXatuEvent</code> previously used <code>strings.Contains</code> over a map &mdash; order-non-deterministic. With ePBS topics added, <code>execution_payload_bid</code> would have randomly routed into the <code>execution_payload</code> envelope branch. Resolver rewritten to (1) split topic, take the <code>&lt;topic_name&gt;</code> segment, (2) exact match wins, (3) otherwise longest <code>&lt;key&gt;_</code> prefix match (preserves subnet-suffix handling for <code>beacon_attestation_*</code>, <code>blob_sidecar_*</code>, <code>data_column_sidecar_*</code>). Regression-tested.</p>
   <table>
-    <thead><tr><th>Event</th><th>Gossip Topic</th><th>Spec</th></tr></thead>
+    <thead><tr><th>Event</th><th>Gossip Topic</th><th>Handler</th><th>Spec</th></tr></thead>
     <tbody>
-      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><code>execution_payload</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload">spec</a></td></tr>
-      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><code>execution_payload_bid</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload_bid">spec</a></td></tr>
-      <tr><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><code>payload_attestation_message</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#payload_attestation_message">spec</a></td></tr>
-      <tr><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><code>proposer_preferences</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#proposer_preferences">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><code>execution_payload</code></td><td><code>gossipsub_execution_payload_envelope.go</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><code>execution_payload_bid</code></td><td><code>gossipsub_execution_payload_bid.go</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#execution_payload_bid">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><code>payload_attestation_message</code></td><td><code>gossipsub_payload_attestation_message.go</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#payload_attestation_message">spec</a></td></tr>
+      <tr><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><code>proposer_preferences</code></td><td><code>gossipsub_proposer_preferences.go</code></td><td><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#proposer_preferences">spec</a></td></tr>
     </tbody>
   </table>
+  <p style="font-size:0.78rem;color:var(--text3);margin-top:0.5rem">Tests: <code>event_gossipsub_test.go</code> (resolver + collision regression, 12 cases) &middot; <code>gossipsub_epbs_test.go</code> (per-handler integration via <code>mockSink</code>) &middot; <code>event_categorizer_test.go</code> count assertions updated (29&rarr;33 events, GroupA 10&rarr;14).</p>
 </section>
 
 <!-- EXISTING EVENTS -->
@@ -325,7 +328,7 @@ details .content p{font-size:0.85rem}
 <!-- CLICKHOUSE -->
 <section>
   <h2>ClickHouse Tables <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>003_gloas_epbs_support</code> (renumbered from 107 after master squashed historical migrations into <code>001_init.up.sql</code>): <strong>12 new tables</strong> + column additions to existing beacon block tables.</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>003_gloas_epbs_support</code> (renumbered from 107 after master squashed historical migrations into <code>001_init.up.sql</code>): <strong>14 new tables</strong> + column additions to existing beacon block tables. The 2 <code>beacon_synthetic_*</code> tables were appended to the same migration on 2026-05-13 (rather than a new <code>004_</code>) because all of this is greenfields &mdash; none of it has been deployed yet.</p>
   <h3>Cannon (from finalized blocks)</h3>
   <table>
     <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
@@ -356,6 +359,15 @@ details .content p{font-size:0.85rem}
       <tr><td><code>libp2p_gossipsub_proposer_preferences</code></td><td>slot, validator_index, fee_recipient, peer_id, message_id</td></tr>
     </tbody>
   </table>
+  <h3>TYSM Synthetic (lifecycle hooks, multi-witness)</h3>
+  <p style="font-size:0.78rem;color:var(--text3);margin-bottom:0.5rem"><code>ReplicatedReplacingMergeTree</code> with <code>meta_client_name</code> in <code>ORDER BY</code> &mdash; each TYSM node keeps its own row. Divergence is signal.</p>
+  <table>
+    <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>beacon_synthetic_payload_status_resolved</code></td><td>slot, block_root, status (PENDING/FULL/EMPTY/INVALID), previous_status, <code>payload_timeliness_votes_{positive,negative,absent}</code>, <code>data_available_votes_{positive,negative,absent}</code> (three-state per consensus-specs <a href="https://github.com/ethereum/consensus-specs/pull/5180">PR #5180</a> — negative/absent NULL until CL exposes Optional[bool]), ptc_size, resolved_at, meta_client_name</td></tr>
+      <tr><td><code>beacon_synthetic_builder_pending_payment_settlement</code></td><td>epoch, builder_index, fee_recipient, amount, weight, quorum, outcome (SETTLED/DROPPED), resolved_at, meta_client_name</td></tr>
+    </tbody>
+  </table>
   <h3>Modified Tables</h3>
   <table>
     <tbody>
@@ -365,7 +377,7 @@ details .content p{font-size:0.85rem}
     </tbody>
   </table>
   <h3 style="margin-top:1rem">Snapshot tests <span class="pill pill-todo">TODO(epbs)</span></h3>
-  <p style="font-size:0.82rem;color:var(--text2)">10 placeholder snapshot tests across <code>pkg/clickhouse/route/{beacon,canonical,libp2p}</code> currently fail with <em>"nil &hellip; payload: invalid event"</em> &mdash; awaiting real Gloas devnet fixtures.</p>
+  <p style="font-size:0.82rem;color:var(--text2)">12 placeholder snapshot tests (10 prior + 2 new <code>beacon_synthetic_*</code>) across <code>pkg/clickhouse/route/{beacon,canonical,libp2p}</code> currently fail with <em>"nil &hellip; payload: invalid event"</em> &mdash; awaiting real Gloas devnet fixtures.</p>
 </section>
 
 <!-- COMPONENT CHANGES -->
@@ -395,46 +407,60 @@ details .content p{font-size:0.85rem}
           <tr><td><span class="pill pill-done">DONE</span></td><td><code>PayloadAttestation</code> deriver</td></tr>
           <tr><td><span class="pill pill-done">DONE</span></td><td><code>ExecutionPayloadBid</code> deriver</td></tr>
           <tr><td><span class="pill pill-done">DONE</span></td><td>Backfilling iterator wiring for CannonType 17/18 (<code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>)</td></tr>
-          <tr><td><span class="pill pill-todo">TODO</span></td><td><code>ExecutionTransaction</code> &mdash; source from envelope (envelope arrival side)</td></tr>
+          <tr><td><span class="pill pill-done">DONE</span></td><td><code>ExecutionTransaction</code> / <code>Withdrawal</code> / <code>BlockAccessList</code> &mdash; envelope-arrival side (Gloas branches call <code>GetExecutionPayloadEnvelope</code>; nil envelope &rarr; empty output)</td></tr>
         </tbody>
       </table>
     </div>
   </div>
   <h3>Server / Event Ingester <span class="pill pill-done">DONE</span></h3>
   <p>12 event handlers (incl. new <code>events_execution_payload_gossip</code> + <code>events_execution_payload_available</code>) + router registration. Master merge renamed <code>pkg/consumoor/route/</code> &rarr; <code>pkg/clickhouse/route/</code>. Cannon location persistence: CannonType 16&ndash;18 + Marshal/Unmarshal. 12 Additional*Data proto messages wired up in routes. Existing beacon block routes append NULL for the four new ePBS columns.</p>
-  <h3>CL Mimicry <span class="pill pill-todo">TODO &mdash; producer side</span></h3>
-  <p>Server-side handlers and ClickHouse routes for the four ePBS gossipsub topics already exist. New producer dispatchers in <code>pkg/clmimicry/</code> are needed to actually emit them &mdash; the existing CL mimicry covers beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar / single_attestation; ePBS topics need adding alongside.</p>
+  <h3>CL Mimicry <span class="pill pill-done">DONE</span></h3>
+  <p>Producer dispatch for all four ePBS gossipsub topics wired in <code>pkg/clmimicry/</code> (2026-05-12). New per-topic handlers (<code>gossipsub_execution_payload_envelope.go</code>, <code>gossipsub_execution_payload_bid.go</code>, <code>gossipsub_payload_attestation_message.go</code>, <code>gossipsub_proposer_preferences.go</code>), payload structs in <code>hermes_event_payload.go</code>, <code>New*Payload(...)</code> builders in <code>payload_builders.go</code> (the API TYSM will call), <code>GossipSub*Enabled</code> config toggles, and Group A registrations in <code>event_catergorizer.go</code>. Topic resolver rewritten to fix a <code>strings.Contains</code>-over-map substring-collision bug between <code>execution_payload</code> and <code>execution_payload_bid</code>.</p>
+  <p style="font-size:0.78rem;color:var(--text3)">Dependency bumps: <code>OffchainLabs/prysm/v7</code> &rarr; <code>v7.1.3-rc.3.0.20260511221050-17a03b4a55e4</code> (glamsterdam-devnet-3 HEAD, exposes ePBS SSZ types). <code>go-ethereum</code> held at <code>v1.17.2-0.20260324190457-8f361e342cb9</code> via <code>replace</code> until ethcore's <code>eth.NewPeer</code> signature is updated.</p>
   <h3>Vector Pipeline <span class="pill pill-info">N/A</span></h3>
   <p>Consumoor (now <code>pkg/clickhouse/</code>) replaces Vector for new events. YAML config not critical.</p>
 </section>
 
 <!-- TYSM -->
 <section>
-  <h2>TYSM: Direct Event Capture</h2>
-  <p><a href="https://github.com/ethpandaops/tysm">TYSM</a> hooks into Prysm directly. Upstream already has preliminary Gloas support.</p>
+  <h2>TYSM: Direct Event Capture <span class="pill pill-done">WIRED 2026-05-13</span></h2>
+  <p><a href="https://github.com/ethpandaops/tysm">TYSM</a> hooks into Prysm directly. The ePBS observe-hook surface landed in <a href="https://github.com/ethpandaops/tysm/pull/23">tysm PR #23</a> on the <code>feat/epbs-observe-hooks</code> branch (off <code>release/runtime-cfg-hooks</code>).</p>
 
-  <h3>New TYSM Hooks</h3>
+  <h3>TYSM ePBS hooks &mdash; all wired</h3>
   <table>
-    <thead><tr><th>Event</th><th>Hook Into</th><th>Xatu TraceEvent</th><th></th></tr></thead>
+    <thead><tr><th>Hook</th><th>Wires Into</th><th>Xatu TraceEvent</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><code>OnPayloadAttestationReceive</code></td><td>PTC gossip validation</td><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><span class="pill pill-p0">P0</span></td></tr>
-      <tr><td><code>OnExecPayloadEnvelopeReceive</code></td><td>Envelope gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><span class="pill pill-p0">P0</span></td></tr>
-      <tr><td><code>OnExecPayloadBidReceive</code></td><td>Bid gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><span class="pill pill-p0">P0</span></td></tr>
-      <tr><td><code>OnProposerPreferencesReceive</code></td><td>Preferences gossip</td><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><span class="pill pill-p1">P1</span></td></tr>
-      <tr><td><code>OnPayloadAttestationProcessed</code></td><td>PTC pool insertion</td><td>(enriched event)</td><td><span class="pill pill-p1">P1</span></td></tr>
+      <tr><td><code>OnExecutionPayloadEnvelopeReceive</code></td><td>envelope gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnExecutionPayloadBidReceive</code></td><td>bid gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnPayloadAttestationReceive</code></td><td>PTC gossip validation</td><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnProposerPreferencesReceive</code></td><td>preferences gossip validation</td><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnPayloadStatusResolved</code></td><td>fork-choice PENDING/FULL/EMPTY/INVALID</td><td><code>BEACON_SYNTHETIC_PAYLOAD_STATUS_RESOLVED</code> (102)</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnBuilderPendingPaymentSettlement</code></td><td>epoch-boundary settle/drop</td><td><code>BEACON_SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT</code> (103)</td><td><span class="pill pill-done">DONE</span></td></tr>
     </tbody>
   </table>
 
-  <h3>Implementation per Hook</h3>
-  <p style="font-size:0.82rem">Each follows the existing pattern (e.g., <code>OnBlockReceive</code>):</p>
-  <ol style="font-size:0.82rem;padding-left:1.5rem;color:var(--text2)">
-    <li>Event type in <code>/overlay/tysm/events/</code></li>
-    <li>Interface in <code>/overlay/tysm/interfaces/</code></li>
-    <li>Dispatcher in <code>/overlay/tysm/dispatcher/p2p_gossip.go</code></li>
-    <li>Emit function in <code>/overlay/tysm/inject.go</code></li>
-    <li>Xatu forwarder in <code>/overlay/tysm/xatu/forwarder/handlers.go</code></li>
-    <li>Prysm patch at gossip validation point</li>
-  </ol>
+  <h3>End-to-end pipeline</h3>
+  <pre style="font-size:0.78rem">prysm gossip validator                    prysm fork-choice / epoch processing
+  &#9500;&#9472; validate_execution_payload_bid.go      &#9500;&#9472; resolve_payload_status (slot N)
+  &#9500;&#9472; validate_execution_payload_envelope.go &#9492;&#9472; process_pending_builder_payments
+  &#9500;&#9472; validate_payload_attestation.go
+  &#9492;&#9472; validate_signed_proposer_preferences.go
+        &darr; tysm.Emit{X}Receive / Emit{Y}                 &darr; same overlay
+overlay/tysm/dispatcher/epbs_{bid,envelope,ptc,proposer_preferences,lifecycle}.go
+        &darr; XatuHook.On{X}Receive / On{Y}
+overlay/tysm/xatu/forwarder/handlers.go
+        &darr; clmimicry.New{X}Payload(msg, meta)
+        &darr; clmimicry.NewBeaconSynthetic{Y}Payload(...)
+xatu pkg/clmimicry router &rarr; server &rarr; ClickHouse</pre>
+  <p style="font-size:0.78rem;color:var(--text3)">Verified: <code>apply-tysm-patch.sh OffchainLabs/prysm develop prysm</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> all clean. Xatu pinned to <code>release/gloas</code> HEAD <code>6da0970e</code> (pseudo-version <code>v1.9.2-0.20260513033032-6da0970e4eae</code>) via tysm's <code>scripts/update-deps.sh</code>; ethcore co-pinned at <code>v0.0.0-20260508010718-193cc4aa5947</code> to keep go-eth2-client consistent. <code>processor_clmimicry.go</code> migrated from <code>attestantio/go-eth2-client</code> &rarr; <code>ethpandaops/go-eth2-client</code> to match xatu <code>release/gloas</code>'s <code>clmimicry.DutiesProvider</code> interface.</p>
+
+  <h3>Why <code>BEACON_SYNTHETIC_*</code></h3>
+  <p style="font-size:0.82rem;color:var(--text2)">Naming parallels the existing <code>LIBP2P_TRACE_SYNTHETIC_HEARTBEAT</code> precedent &mdash; honest about the fact we're synthesising these via CL instrumentation; there's no beacon-API SSE equivalent. Both fire on <em>every</em> TYSM node (every slot / every epoch boundary respectively). Server-side dedup is intentionally not applied: <code>meta_client_name</code> is part of the ClickHouse <code>ORDER BY</code> so each witness keeps its own row. Divergence between nodes is signal (one sees the envelope, another doesn't; different fork-choice timing; per-node settle/drop latency).</p>
+
+  <h3>Out-of-scope follow-ups</h3>
+  <ul style="font-size:0.82rem;padding-left:1.5rem;color:var(--text2)">
+    <li><code>OnPayloadAttestationProcessed</code> (PTC pool insertion enriched event) &mdash; nice-to-have; not part of the gossip-topic core.</li>
+  </ul>
 
   <h3>Existing TYSM Events Changing Under Gloas</h3>
   <table>
@@ -458,7 +484,7 @@ details .content p{font-size:0.85rem}
       <tr><td><code>go-ethereum</code></td><td><code>v1.17.2-0.20260324190457-8f361e342cb9</code></td><td><span class="pill pill-done">DONE</span> &mdash; bal-devnet-3</td></tr>
       <tr><td><code>ethpandaops/ethcore</code></td><td><code>v0.0.0-20260508010718-193cc4aa5947</code></td><td><span class="pill pill-done">DONE</span> &mdash; merged BAL + eth/68/69/70</td></tr>
       <tr><td><code>ethpandaops/beacon</code></td><td><code>v0.67.1-0.20260507052247-b31a645f6e36</code></td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>tysm</code> Gloas hooks</td><td>Architecture ready</td><td><span class="pill pill-todo">TODO</span> &mdash; we control</td></tr>
+      <tr><td><code>tysm</code> Gloas hooks</td><td><a href="https://github.com/ethpandaops/tysm/pull/23"><code>feat/epbs-observe-hooks</code></a> merged into <code>release/runtime-cfg-hooks</code>; xatu pin <code>6da0970e</code></td><td><span class="pill pill-done">DONE</span> &mdash; 4 gossip + 2 synthetic lifecycle wired end-to-end</td></tr>
     </tbody>
   </table>
 </section>
@@ -469,10 +495,10 @@ details .content p{font-size:0.85rem}
   <table>
     <thead><tr><th>Item</th><th>Where</th><th>Priority</th></tr></thead>
     <tbody>
-      <tr><td>CL mimicry gossipsub producers (4 topics)</td><td><code>pkg/clmimicry/</code></td><td><span class="pill pill-p0">P0</span></td></tr>
-      <tr><td>Snapshot test fixtures (10 placeholder tests)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
-      <tr><td>TYSM ePBS hooks (5 events)</td><td>separate repo</td><td><span class="pill pill-p1">P1</span></td></tr>
-      <tr><td>Cannon <code>ExecutionTransaction</code> &amp; <code>BlockAccessList</code> &mdash; envelope-arrival side</td><td><code>pkg/cannon/deriver/beacon/eth/v2/</code></td><td><span class="pill pill-p1">P1</span> &mdash; depends on devnet</td></tr>
+      <tr><td>Snapshot test fixtures (12 placeholder tests: 10 prior + 2 <code>beacon_synthetic_*</code>)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
+      <tr><td>TYSM <code>OnPayloadAttestationProcessed</code> (PTC pool insertion enriched event)</td><td>tysm</td><td><span class="pill pill-info">nice-to-have</span> &mdash; not gossip-topic core</td></tr>
+      <tr><td>Sentry Gloas block subscription &mdash; devnet verification</td><td><code>pkg/sentry/sentry.go</code></td><td><span class="pill pill-info">verify, not wire</span></td></tr>
+      <tr><td>Drop <code>go-ethereum</code> <code>replace</code> after ethcore <code>eth.NewPeer</code> bump</td><td><code>go.mod</code></td><td><span class="pill pill-info">follow-up</span></td></tr>
       <tr><td>Beacon API <code>head_v2</code> + <code>chain_reorg</code> field updates</td><td>sentry handler</td><td><span class="pill pill-info">in-flight upstream</span></td></tr>
     </tbody>
   </table>
