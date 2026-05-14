@@ -185,12 +185,9 @@ section:nth-child(8){animation-delay:0.35s}
     <span class="tag">Fork Version <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork.md#configuration">0x07000000</a></span>
     <span class="tag">Specs <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas">consensus</a> / <a href="https://github.com/ethereum/execution-specs/tree/forks/amsterdam">execution</a></span>
     <span class="tag">Repos <a href="https://github.com/ethpandaops/xatu">xatu</a> / <a href="https://github.com/ethpandaops/tysm">tysm</a></span>
-    <span class="tag">Updated 2026-05-14 (master merge applied)</span>
-    <span class="tag">xatu HEAD <code>cede841b</code></span>
-    <span class="tag">Audit <a href="../glamsterdam_audit_2026-05-13.md">2026-05-13.md §11</a></span>
-  </div>
-  <div style="margin-top:1rem;padding:0.75rem 1rem;background:rgba(255,193,7,0.08);border-left:3px solid #ffc107;font-size:0.82rem;color:var(--text2)">
-    <strong>2026-05-14 master merge note:</strong> <code>master</code> merged into <code>release/gloas</code> (merge commit <code>cede841b</code>). Pulled in <code>ethpandaops/go-eth2-client v0.1.2</code> tagged release (<a href="https://github.com/ethpandaops/go-eth2-client/pull/20">PR #20 fork-agnostic types</a>: <code>BaseFeePerGasLE</code> rename in bellatrix/capella + new <code>VersionedSignedExecutionPayloadEnvelope</code> wrapper) and the new <code>s3blobstore</code> output sink. <code>beacon</code> → <code>0260912</code>, <code>ethcore</code> → <code>4e1b5fb</code> (both release/gloas branch HEADs). Fixed missing server-side <code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> handler wiring. <strong>Outstanding:</strong> bump tysm xatu pin <code>06a673d3</code> → <code>cede841b</code>.
+    <span class="tag">Updated 2026-05-14</span>
+    <span class="tag">xatu HEAD <code>ac83f1a9</code></span>
+    <span class="tag">Audit <a href="../glamsterdam_audit_2026-05-13.md">2026-05-13.md</a></span>
   </div>
 </div>
 
@@ -246,7 +243,7 @@ section:nth-child(8){animation-delay:0.35s}
           <tr><td><code>OnPayloadAttestationProcessed</code></td><td>Post-validation PTC enrichment &rarr; <code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> (104)</td><td><span class="pill pill-done">DONE</span></td></tr>
         </tbody>
       </table>
-      <p style="font-size:0.78rem;color:var(--text3);margin-top:0.5rem">End-to-end: prysm gossip validator &rarr; <code>tysm.Emit*Receive</code> &rarr; dispatcher &rarr; <code>XatuHook.On*Receive</code> &rarr; forwarder &rarr; <code>clmimicry.New*Payload</code> &rarr; xatu router &rarr; server &rarr; ClickHouse. Verified by <code>apply-tysm-patch.sh</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> &mdash; all clean. xatu pinned to <code>release/gloas</code> HEAD via <code>scripts/update-deps.sh</code>.</p>
+      <p style="font-size:0.78rem;color:var(--text3);margin-top:0.5rem">Pipeline: prysm gossip validator &rarr; <code>tysm.Emit*Receive</code> &rarr; dispatcher &rarr; <code>XatuHook.On*Receive</code> &rarr; forwarder &rarr; <code>clmimicry.New*Payload</code> &rarr; xatu router &rarr; server &rarr; ClickHouse.</p>
     </div>
   </div>
 </section>
@@ -257,7 +254,7 @@ section:nth-child(8){animation-delay:0.35s}
   <details open>
     <summary>Sentry SSE handlers wired in <code>pkg/sentry/sentry.go</code> <span class="pill pill-done">6 handlers</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">All six SSE callbacks live: <code>OnExecutionPayload</code>, <code>OnExecutionPayloadGossip</code>, <code>OnExecutionPayloadAvailable</code>, <code>OnExecutionPayloadBid</code>, <code>OnPayloadAttestationMessage</code>, <code>OnProposerPreferences</code>. Now unblocked by the ethpandaops fork of go-eth2-client carrying combined BAL+ePBS.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem"><code>OnExecutionPayload</code>, <code>OnExecutionPayloadGossip</code>, <code>OnExecutionPayloadAvailable</code>, <code>OnExecutionPayloadBid</code>, <code>OnPayloadAttestationMessage</code>, <code>OnProposerPreferences</code>.</p>
       <table>
         <thead><tr><th>SSE Topic</th><th>Xatu Event</th></tr></thead>
         <tbody>
@@ -294,7 +291,7 @@ section:nth-child(8){animation-delay:0.35s}
   <details open>
     <summary>New Sentry SSE Events (real-time) <span class="pill pill-done">6 events &mdash; wired</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">All sentry handlers live in <code>pkg/sentry/event/beacon/eth/v1/</code> and registered via callbacks in <code>pkg/sentry/sentry.go</code>. Snapshot fixtures for the ClickHouse routes are <code>TODO(epbs)</code> placeholders awaiting Gloas devnet data.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Snapshot fixtures for ClickHouse routes are placeholders awaiting Gloas devnet captures.</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th><th>beacon-APIs</th></tr></thead>
         <tbody>
@@ -312,7 +309,7 @@ section:nth-child(8){animation-delay:0.35s}
   <details>
     <summary>New Cannon Derived Events (from finalized blocks) <span class="pill pill-done">3 derivers wired</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Derivers wired in <code>pkg/cannon/cannon.go</code>. <code>CannonType</code> enum entries 16/17/18 added with Marshal/Unmarshal. Backfilling iterator (<code>GetMarker</code> + <code>createLocationFromEpochNumber</code> in <code>pkg/cannon/iterator/backfilling_checkpoint_iterator.go</code>) handles all three new types.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Backfilling iterator covers all three new <code>CannonType</code> entries (16/17/18).</p>
       <table>
         <thead><tr><th>Event</th><th>Description</th></tr></thead>
         <tbody>
@@ -327,7 +324,7 @@ section:nth-child(8){animation-delay:0.35s}
   <details>
     <summary>New P2P Gossip Events (CL mimicry) <span class="pill pill-done">4 events &mdash; wired</span></summary>
     <div class="content">
-      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Producer dispatch wired in <code>pkg/clmimicry/</code> (2026-05-12) alongside existing beacon_block / attestation / aggregate_and_proof / blob_sidecar / data_column_sidecar handlers. Each per-topic handler builds the gossipsub summary proto, attaches <code>AdditionalData</code> (wallclock, propagation diff, peer_id, message_id), and emits a <code>DecoratedEvent</code>. <code>New*Payload(...)</code> builders in <code>payload_builders.go</code> are the API TYSM will call from prysm gossip-validation hooks. Topic resolver rewritten to fix a <code>strings.Contains</code> substring-collision bug between <code>execution_payload</code> and <code>execution_payload_bid</code>.</p>
+      <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Each per-topic handler emits a <code>DecoratedEvent</code> with wallclock + propagation timing + peer / message IDs. <code>New*Payload(...)</code> builders are the API tysm calls from prysm gossip-validation hooks.</p>
       <table>
         <thead><tr><th>Event</th><th>Gossip Topic</th><th>Handler</th></tr></thead>
         <tbody>
@@ -366,11 +363,9 @@ section:nth-child(8){animation-delay:0.35s}
 
 <!-- OPEN QUESTIONS -->
 <section>
-  <h2>Open Questions &amp; Recently Answered</h2>
+  <h2>Open Questions</h2>
   <div class="question"><div class="cat">Architecture</div><p><strong>Block-Payload Correlation:</strong> How do we correlate beacon blocks with separately-arriving execution payloads in ClickHouse? Same slot + block_root? Denormalize? Dedicated timeline table?</p></div>
-  <div class="question"><div class="cat">Architecture</div><p><strong>Empty Block Handling:</strong> When builder withholds payload &mdash; NULL execution payload fields? Explicit <code>payload_status</code> column? Both? <em>Partial answer:</em> <code>payload_present</code> flag landed on beacon_block tables; payload_status on fork-choice nodes.</p></div>
-  <div class="question" style="border-left-color:var(--accent)"><div class="cat" style="color:var(--accent)">Answered</div><p><strong>Attestation index column:</strong> No new <code>payload_vote</code> projection &mdash; <code>committee_index</code> already stores raw <code>data.index</code>; consumers can derive 0/1 for Gloas+ rows. Spec doesn't introduce a name we'd be matching anyway.</p></div>
-  <div class="question" style="border-left-color:var(--accent)"><div class="cat" style="color:var(--accent)">Answered</div><p><strong>DataColumnSidecar projection columns:</strong> Reverted &mdash; will revisit when real Gloas SSE payloads arrive instead of guessing field names.</p></div>
+  <div class="question"><div class="cat">Architecture</div><p><strong>Empty Block Handling:</strong> When builder withholds payload &mdash; NULL execution payload fields? Explicit <code>payload_status</code> column? Both? <em>Partial:</em> <code>payload_present</code> flag landed on beacon_block tables; payload_status on fork-choice nodes.</p></div>
   <div class="question"><div class="cat">Data Model</div><p><strong>Builder vs Validator withdrawals:</strong> Separate tables or <code>withdrawal_type</code> column?</p></div>
 </section>
 
@@ -423,11 +418,11 @@ section:nth-child(8){animation-delay:0.35s}
 <!-- UPSTREAM DEPS -->
 <section>
   <h2>Upstream Dependencies</h2>
-  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status"><code>ethpandaops/go-eth2-client v0.1.2</code> &mdash; tagged release; <a href="https://github.com/ethpandaops/go-eth2-client/pull/20">PR #20 fork-agnostic types</a> (<code>BaseFeePerGasLE</code> rename + <code>VersionedSignedExecutionPayloadEnvelope</code> wrapper) <span class="pill pill-done">DONE</span> &mdash; bumped from pseudo-version via 2026-05-14 master merge</span></div>
-  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status"><code>v1.17.2-0.20260324190457-8f361e342cb9</code> (BAL fork <code>bal-devnet-3</code>, via <code>replace</code>) <span class="pill pill-done">DONE</span> &middot; load-bearing while ethcore uses old 4-arg <code>eth.NewPeer</code></span></div>
-  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status"><code>v0.0.0-20260513234517-4e1b5fbbc61b</code> (release/gloas branch HEAD <code>4e1b5fb</code>) &mdash; merged BAL+eth/68/69/70 branch <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types)</span></div>
-  <div class="dep-row"><span class="dep-name">beacon</span><span class="dep-status"><code>ethpandaops/beacon v0.68.1-0.20260513233739-0260912e4454</code> (release/gloas branch HEAD <code>0260912</code>) <span class="pill pill-done">DONE</span></span></div>
-  <div class="dep-row"><span class="dep-name">tysm</span><span class="dep-status">Gloas hooks: <a href="https://github.com/ethpandaops/tysm/pull/23">PR #23</a> merged into <code>release/runtime-cfg-hooks</code> <span class="pill pill-done">DONE</span> &mdash; 4 gossip + 3 synthetic lifecycle events wired end-to-end; xatu pinned to <strong>pre-master-merge</strong> <code>06a673d3</code> (pseudo-version <code>v1.9.2-0.20260513232157-06a673d38111</code>) &middot; <span class="pill pill-blocked">TODO</span> bump tysm pin to post-merge xatu HEAD <code>cede841b</code></span></div>
+  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status"><code>ethpandaops/go-eth2-client v0.1.2</code> <span class="pill pill-done">DONE</span></span></div>
+  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status"><code>bal-devnet-6</code> via <code>replace</code> &mdash; matches glamsterdam-devnet-3 EL <span class="pill pill-done">DONE</span></span></div>
+  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status">release/gloas HEAD <code>f67d7a6</code> <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types)</span></div>
+  <div class="dep-row"><span class="dep-name">beacon</span><span class="dep-status">release/gloas HEAD <code>ddfa770</code> <span class="pill pill-done">DONE</span></span></div>
+  <div class="dep-row"><span class="dep-name">tysm</span><span class="dep-status"><a href="https://github.com/ethpandaops/tysm/pull/23">PR #23</a> merged into <code>release/runtime-cfg-hooks</code> (HEAD <code>e856f0b2e</code>); xatu pin <code>ac83f1a9</code>, ethcore pin <code>f67d7a6</code> <span class="pill pill-done">DONE</span></span></div>
 </section>
 
 <!-- SPEC REFS -->

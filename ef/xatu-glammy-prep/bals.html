@@ -170,7 +170,7 @@ details .content p{font-size:0.85rem}
           <tr><td>ClickHouse: table + <code>execution_payload_block_access_list_root</code></td><td>Migration <code>002_gloas_bals_support</code></td></tr>
           <tr><td>Block conversion: <code>NewEventBlockFromGloas()</code></td><td><code>pkg/proto/eth/block.go</code></td></tr>
           <tr><td>Checkpoint/backfill support</td><td>CannonType 16 + location serialization</td></tr>
-          <tr><td>Deps aligned</td><td>go-ethereum bal-devnet-3, ethcore merged-master, beacon, ethpandaops/go-eth2-client combined fork</td></tr>
+          <tr><td>Deps aligned</td><td>go-ethereum <code>bal-devnet-6</code>, ethcore + beacon release/gloas, ethpandaops/go-eth2-client <code>v0.1.2</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -183,10 +183,10 @@ details .content p{font-size:0.85rem}
   <table>
     <thead><tr><th>Dependency</th><th>Pinned at</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2</code> (tagged release; <a href="https://github.com/ethpandaops/go-eth2-client/pull/20">PR #20 fork-agnostic types</a>)</td><td><span class="pill pill-done">DONE</span> combined BAL+ePBS+gloas fork &mdash; bumped 2026-05-14 via master merge</td></tr>
-      <tr><td><code>go-ethereum</code></td><td><code>v1.17.2-0.20260324190457-8f361e342cb9</code> (via <code>replace</code>)</td><td><span class="pill pill-done">DONE</span> bal-devnet-3 (load-bearing)</td></tr>
-      <tr><td><code>ethpandaops/ethcore</code></td><td><code>v0.0.0-20260513234517-4e1b5fbbc61b</code> (release/gloas branch HEAD <code>4e1b5fb</code>)</td><td><span class="pill pill-done">DONE</span> merged BAL + eth/68/69/70 &mdash; bumped 2026-05-14</td></tr>
-      <tr><td><code>ethpandaops/beacon</code></td><td><code>v0.68.1-0.20260513233739-0260912e4454</code> (release/gloas branch HEAD <code>0260912</code>)</td><td><span class="pill pill-done">DONE</span> &mdash; bumped 2026-05-14</td></tr>
+      <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>go-ethereum</code></td><td><code>bal-devnet-6</code> via <code>replace</code></td><td><span class="pill pill-done">DONE</span> matches glamsterdam-devnet-3 EL</td></tr>
+      <tr><td><code>ethpandaops/ethcore</code></td><td>release/gloas HEAD <code>f67d7a6</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethpandaops/beacon</code></td><td>release/gloas HEAD <code>ddfa770</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>ethcore</code> eth/71</td><td>n/a</td><td><span class="pill pill-blocked">DEFERRED</span> go-ethereum lacks eth/71 types</td></tr>
     </tbody>
   </table>
