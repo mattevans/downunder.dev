@@ -185,8 +185,12 @@ section:nth-child(8){animation-delay:0.35s}
     <span class="tag">Fork Version <a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/fork.md#configuration">0x07000000</a></span>
     <span class="tag">Specs <a href="https://github.com/ethereum/consensus-specs/tree/master/specs/gloas">consensus</a> / <a href="https://github.com/ethereum/execution-specs/tree/forks/amsterdam">execution</a></span>
     <span class="tag">Repos <a href="https://github.com/ethpandaops/xatu">xatu</a> / <a href="https://github.com/ethpandaops/tysm">tysm</a></span>
-    <span class="tag">Updated 2026-05-13 (audit applied)</span>
-    <span class="tag">Audit <a href="../glamsterdam_audit_2026-05-13.md">2026-05-13.md</a></span>
+    <span class="tag">Updated 2026-05-14 (master merge applied)</span>
+    <span class="tag">xatu HEAD <code>cede841b</code></span>
+    <span class="tag">Audit <a href="../glamsterdam_audit_2026-05-13.md">2026-05-13.md §11</a></span>
+  </div>
+  <div style="margin-top:1rem;padding:0.75rem 1rem;background:rgba(255,193,7,0.08);border-left:3px solid #ffc107;font-size:0.82rem;color:var(--text2)">
+    <strong>2026-05-14 master merge note:</strong> <code>master</code> merged into <code>release/gloas</code> (merge commit <code>cede841b</code>). Pulled in <code>ethpandaops/go-eth2-client v0.1.2</code> tagged release (<a href="https://github.com/ethpandaops/go-eth2-client/pull/20">PR #20 fork-agnostic types</a>: <code>BaseFeePerGasLE</code> rename in bellatrix/capella + new <code>VersionedSignedExecutionPayloadEnvelope</code> wrapper) and the new <code>s3blobstore</code> output sink. <code>beacon</code> → <code>0260912</code>, <code>ethcore</code> → <code>4e1b5fb</code> (both release/gloas branch HEADs). Fixed missing server-side <code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> handler wiring. <strong>Outstanding:</strong> bump tysm xatu pin <code>06a673d3</code> → <code>cede841b</code>.
   </div>
 </div>
 
@@ -239,6 +243,7 @@ section:nth-child(8){animation-delay:0.35s}
           <tr><td><code>OnProposerPreferencesReceive</code></td><td><code>proposer_preferences</code> gossip</td><td><span class="pill pill-done">DONE</span></td></tr>
           <tr><td><code>OnPayloadStatusResolved</code></td><td>Fork-choice PENDING/FULL/EMPTY/INVALID &rarr; <code>BEACON_SYNTHETIC_PAYLOAD_STATUS_RESOLVED</code> (102)</td><td><span class="pill pill-done">DONE</span></td></tr>
           <tr><td><code>OnBuilderPendingPaymentSettlement</code></td><td>Epoch-boundary settle/drop &rarr; <code>BEACON_SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT</code> (103)</td><td><span class="pill pill-done">DONE</span></td></tr>
+          <tr><td><code>OnPayloadAttestationProcessed</code></td><td>Post-validation PTC enrichment &rarr; <code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> (104)</td><td><span class="pill pill-done">DONE</span></td></tr>
         </tbody>
       </table>
       <p style="font-size:0.78rem;color:var(--text3);margin-top:0.5rem">End-to-end: prysm gossip validator &rarr; <code>tysm.Emit*Receive</code> &rarr; dispatcher &rarr; <code>XatuHook.On*Receive</code> &rarr; forwarder &rarr; <code>clmimicry.New*Payload</code> &rarr; xatu router &rarr; server &rarr; ClickHouse. Verified by <code>apply-tysm-patch.sh</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> &mdash; all clean. xatu pinned to <code>release/gloas</code> HEAD via <code>scripts/update-deps.sh</code>.</p>
@@ -419,11 +424,11 @@ section:nth-child(8){animation-delay:0.35s}
 <!-- UPSTREAM DEPS -->
 <section>
   <h2>Upstream Dependencies</h2>
-  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status"><code>ethpandaops/go-eth2-client v0.1.2-0.20260507042554-4e9992fe2f0e</code> &mdash; combined BAL+ePBS fork <span class="pill pill-done">DONE</span></span></div>
-  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status"><code>v1.17.2-0.20260324190457-8f361e342cb9</code> (BAL fork, latest <code>bal-devnet-3</code>) <span class="pill pill-done">DONE</span> &middot; ePBS EL: not required server-side</span></div>
-  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status"><code>v0.0.0-20260508010718-193cc4aa5947</code> &mdash; merged BAL+eth/68/69/70 branch <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types)</span></div>
-  <div class="dep-row"><span class="dep-name">beacon</span><span class="dep-status"><code>ethpandaops/beacon v0.67.1-0.20260507052247-b31a645f6e36</code> <span class="pill pill-done">DONE</span></span></div>
-  <div class="dep-row"><span class="dep-name">tysm</span><span class="dep-status">Gloas hooks: <a href="https://github.com/ethpandaops/tysm/pull/23">PR #23</a> merged into <code>release/runtime-cfg-hooks</code> <span class="pill pill-done">DONE</span> &mdash; 4 gossip + 2 synthetic lifecycle events wired end-to-end; xatu pinned to <code>release/gloas</code> HEAD <code>6da0970e</code> (pseudo-version <code>v1.9.2-0.20260513033032-6da0970e4eae</code>)</span></div>
+  <div class="dep-row"><span class="dep-name">go-eth2-client</span><span class="dep-status"><code>ethpandaops/go-eth2-client v0.1.2</code> &mdash; tagged release; <a href="https://github.com/ethpandaops/go-eth2-client/pull/20">PR #20 fork-agnostic types</a> (<code>BaseFeePerGasLE</code> rename + <code>VersionedSignedExecutionPayloadEnvelope</code> wrapper) <span class="pill pill-done">DONE</span> &mdash; bumped from pseudo-version via 2026-05-14 master merge</span></div>
+  <div class="dep-row"><span class="dep-name">go-ethereum</span><span class="dep-status"><code>v1.17.2-0.20260324190457-8f361e342cb9</code> (BAL fork <code>bal-devnet-3</code>, via <code>replace</code>) <span class="pill pill-done">DONE</span> &middot; load-bearing while ethcore uses old 4-arg <code>eth.NewPeer</code></span></div>
+  <div class="dep-row"><span class="dep-name">ethcore</span><span class="dep-status"><code>v0.0.0-20260513234517-4e1b5fbbc61b</code> (release/gloas branch HEAD <code>4e1b5fb</code>) &mdash; merged BAL+eth/68/69/70 branch <span class="pill pill-done">DONE</span> &middot; eth/71: <span class="pill pill-blocked">DEFERRED</span> (go-ethereum lacks types)</span></div>
+  <div class="dep-row"><span class="dep-name">beacon</span><span class="dep-status"><code>ethpandaops/beacon v0.68.1-0.20260513233739-0260912e4454</code> (release/gloas branch HEAD <code>0260912</code>) <span class="pill pill-done">DONE</span></span></div>
+  <div class="dep-row"><span class="dep-name">tysm</span><span class="dep-status">Gloas hooks: <a href="https://github.com/ethpandaops/tysm/pull/23">PR #23</a> merged into <code>release/runtime-cfg-hooks</code> <span class="pill pill-done">DONE</span> &mdash; 4 gossip + 3 synthetic lifecycle events wired end-to-end; xatu pinned to <strong>pre-master-merge</strong> <code>06a673d3</code> (pseudo-version <code>v1.9.2-0.20260513232157-06a673d38111</code>) &middot; <span class="pill pill-blocked">TODO</span> bump tysm pin to post-merge xatu HEAD <code>cede841b</code></span></div>
 </section>
 
 <!-- SPEC REFS -->
