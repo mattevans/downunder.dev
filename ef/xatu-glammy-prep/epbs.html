@@ -322,7 +322,7 @@ details .content p{font-size:0.85rem}
 <!-- CLICKHOUSE -->
 <section>
   <h2>ClickHouse Tables <span class="pill pill-done">DONE</span></h2>
-  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>003_gloas_epbs_support</code>: 14 new tables + column additions on existing beacon block tables. The 3 <code>beacon_synthetic_*</code> tables are appended to the same migration since nothing has deployed yet.</p>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:1rem">Migration <code>004_gloas_epbs_support</code>: 14 new tables + column additions on existing beacon block tables. The 3 <code>beacon_synthetic_*</code> tables are appended to the same migration since nothing has deployed yet.</p>
   <h3>Cannon (from finalized blocks)</h3>
   <table>
     <thead><tr><th>Table</th><th>Key Columns</th></tr></thead>
@@ -427,9 +427,9 @@ details .content p{font-size:0.85rem}
       <tr><td><code>OnExecutionPayloadBidReceive</code></td><td>bid gossip validation</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>OnPayloadAttestationReceive</code></td><td>PTC gossip validation</td><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>OnProposerPreferencesReceive</code></td><td>preferences gossip validation</td><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>OnPayloadStatusResolved</code></td><td>fork-choice PENDING/FULL/EMPTY/INVALID</td><td><code>BEACON_SYNTHETIC_PAYLOAD_STATUS_RESOLVED</code> (102)</td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>OnBuilderPendingPaymentSettlement</code></td><td>epoch-boundary settle/drop</td><td><code>BEACON_SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT</code> (103)</td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>OnPayloadAttestationProcessed</code></td><td>post-validation PTC commit (signature + PTC + dedup)</td><td><code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> (104)</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnPayloadStatusResolved</code></td><td>fork-choice PENDING/FULL/EMPTY/INVALID</td><td><code>BEACON_SYNTHETIC_PAYLOAD_STATUS_RESOLVED</code> (103)</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnBuilderPendingPaymentSettlement</code></td><td>epoch-boundary settle/drop</td><td><code>BEACON_SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT</code> (104)</td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>OnPayloadAttestationProcessed</code></td><td>post-validation PTC commit (signature + PTC + dedup)</td><td><code>BEACON_SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code> (105)</td><td><span class="pill pill-done">DONE</span></td></tr>
     </tbody>
   </table>
 
@@ -446,7 +446,7 @@ overlay/tysm/xatu/forwarder/handlers.go
         &darr; clmimicry.New{X}Payload(msg, meta)
         &darr; clmimicry.NewBeaconSynthetic{Y}Payload(...)
 xatu pkg/clmimicry router &rarr; server &rarr; ClickHouse</pre>
-  <p style="font-size:0.78rem;color:var(--text3)">Verified end-to-end: <code>apply-tysm-patch.sh OffchainLabs/prysm develop prysm</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> all clean. tysm pin: xatu <code>ac83f1a9</code>, ethcore <code>f67d7a6</code>.</p>
+  <p style="font-size:0.78rem;color:var(--text3)">Verified end-to-end: <code>apply-tysm-patch.sh OffchainLabs/prysm develop prysm</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> all clean. tysm pin: xatu <code>7d40f6fb</code>, ethcore <code>f67d7a6</code>.</p>
 
   <h3>Why <code>BEACON_SYNTHETIC_*</code></h3>
   <p style="font-size:0.82rem;color:var(--text2)">Naming parallels the existing <code>LIBP2P_TRACE_SYNTHETIC_HEARTBEAT</code> precedent &mdash; honest about the fact we're synthesising these via CL instrumentation; there's no beacon-API SSE equivalent. Both fire on <em>every</em> TYSM node (every slot / every epoch boundary respectively). Server-side dedup is intentionally not applied: <code>meta_client_name</code> is part of the ClickHouse <code>ORDER BY</code> so each witness keeps its own row. Divergence between nodes is signal (one sees the envelope, another doesn't; different fork-choice timing; per-node settle/drop latency).</p>
@@ -472,8 +472,8 @@ xatu pkg/clmimicry router &rarr; server &rarr; ClickHouse</pre>
       <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>go-ethereum</code></td><td><code>bal-devnet-6</code> via <code>replace</code></td><td><span class="pill pill-done">DONE</span> &mdash; matches glamsterdam-devnet-3 EL</td></tr>
       <tr><td><code>ethpandaops/ethcore</code></td><td>release/gloas HEAD <code>f67d7a6</code></td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>ethpandaops/beacon</code></td><td>release/gloas HEAD <code>ddfa770</code></td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>tysm</code> Gloas hooks</td><td><a href="https://github.com/ethpandaops/tysm/pull/23"><code>feat/epbs-observe-hooks</code></a> on <code>release/runtime-cfg-hooks</code> (HEAD <code>e856f0b2e</code>); xatu pin <code>ac83f1a9</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethpandaops/beacon</code></td><td>release/gloas HEAD <code>81b9ef3</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>tysm</code> Gloas hooks</td><td><a href="https://github.com/ethpandaops/tysm/pull/23"><code>feat/epbs-observe-hooks</code></a> on <code>release/runtime-cfg-hooks</code> (HEAD <code>e856f0b2e</code>); xatu pin <code>7d40f6fb</code></td><td><span class="pill pill-done">DONE</span></td></tr>
     </tbody>
   </table>
 </section>
@@ -485,7 +485,7 @@ xatu pkg/clmimicry router &rarr; server &rarr; ClickHouse</pre>
     <thead><tr><th>Item</th><th>Where</th><th>Priority</th></tr></thead>
     <tbody>
       <tr><td>Snapshot test fixtures (12 placeholder tests: 10 prior + 2 <code>beacon_synthetic_*</code>)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
-      <tr><td><s>TYSM <code>OnPayloadAttestationProcessed</code></s></td><td>tysm + xatu</td><td><span class="pill pill-done">DONE</span> 2026-05-13 &mdash; synthetic event 104</td></tr>
+      <tr><td><s>TYSM <code>OnPayloadAttestationProcessed</code></s></td><td>tysm + xatu</td><td><span class="pill pill-done">DONE</span> 2026-05-13 &mdash; synthetic event 105</td></tr>
       <tr><td>Sentry Gloas block subscription &mdash; devnet verification</td><td><code>pkg/sentry/sentry.go</code></td><td><span class="pill pill-info">verify, not wire</span></td></tr>
       <tr><td>Drop <code>go-ethereum</code> <code>replace</code> after ethcore <code>eth.NewPeer</code> bump</td><td><code>go.mod</code></td><td><span class="pill pill-info">follow-up</span></td></tr>
       <tr><td>Beacon API <code>head_v2</code> + <code>chain_reorg</code> field updates</td><td>sentry handler</td><td><span class="pill pill-info">in-flight upstream</span></td></tr>

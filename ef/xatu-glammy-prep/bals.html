@@ -156,13 +156,13 @@ details .content p{font-size:0.85rem}
           <tr><td>Proto: <code>BlockAccessList</code>, <code>BlockAccessListEntry</code>, <code>BlockAccessListChange</code></td><td><code>eth/v1/block_access_list.proto</code></td></tr>
           <tr><td>Proto: <code>BlockAccessListStorageRead</code></td><td>Typed message for read-only slots</td></tr>
           <tr><td>Proto: <code>BeaconBlockGloas</code>, <code>ExecutionPayloadGloas</code></td><td><code>eth/v2/beacon_block.proto</code>, <code>eth/v1/execution_engine.proto</code></td></tr>
-          <tr><td>Event type: <code>BEACON_API_ETH_V2_BEACON_BLOCK_ACCESS_LIST = 89</code></td><td><code>xatu/event_ingester.proto</code></td></tr>
+          <tr><td>Event type: <code>BEACON_API_ETH_V2_BEACON_BLOCK_ACCESS_LIST = 90</code></td><td><code>xatu/event_ingester.proto</code></td></tr>
           <tr><td>Cannon deriver: all 6 change types + <code>touched</code></td><td><code>pkg/cannon/deriver/beacon/eth/v2/block_access_list.go</code></td></tr>
           <tr><td>RLP decoding + <code>storage_reads</code></td><td><code>pkg/proto/eth/v1/conversion.go</code> (with tests)</td></tr>
           <tr><td>Sentry: Gloas block handling</td><td><code>DataVersionGloas</code> in version switch</td></tr>
           <tr><td>ClickHouse route: BAL</td><td><code>pkg/clickhouse/route/canonical/canonical_beacon_block_access_list.go</code></td></tr>
           <tr><td>Server event handler</td><td>Routes and validates BAL events</td></tr>
-          <tr><td>ClickHouse: table + <code>execution_payload_block_access_list_root</code></td><td>Migration <code>002_gloas_bals_support</code></td></tr>
+          <tr><td>ClickHouse: table + <code>execution_payload_block_access_list_root</code></td><td>Migration <code>003_gloas_bals_support</code></td></tr>
           <tr><td>Block conversion: <code>NewEventBlockFromGloas()</code></td><td><code>pkg/proto/eth/block.go</code></td></tr>
           <tr><td>Checkpoint/backfill support</td><td>CannonType 16 + location serialization</td></tr>
           <tr><td>Deps aligned</td><td>go-ethereum <code>bal-devnet-6</code>, ethcore + beacon release/gloas, ethpandaops/go-eth2-client <code>v0.1.2</code></td></tr>
@@ -181,7 +181,7 @@ details .content p{font-size:0.85rem}
       <tr><td><code>ethpandaops/go-eth2-client</code></td><td><code>v0.1.2</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>go-ethereum</code></td><td><code>bal-devnet-6</code> via <code>replace</code></td><td><span class="pill pill-done">DONE</span> matches glamsterdam-devnet-3 EL</td></tr>
       <tr><td><code>ethpandaops/ethcore</code></td><td>release/gloas HEAD <code>f67d7a6</code></td><td><span class="pill pill-done">DONE</span></td></tr>
-      <tr><td><code>ethpandaops/beacon</code></td><td>release/gloas HEAD <code>ddfa770</code></td><td><span class="pill pill-done">DONE</span></td></tr>
+      <tr><td><code>ethpandaops/beacon</code></td><td>release/gloas HEAD <code>81b9ef3</code></td><td><span class="pill pill-done">DONE</span></td></tr>
       <tr><td><code>ethcore</code> eth/71</td><td>n/a</td><td><span class="pill pill-blocked">DEFERRED</span> go-ethereum lacks eth/71 types</td></tr>
     </tbody>
   </table>
