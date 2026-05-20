@@ -109,7 +109,7 @@ details .content p{font-size:0.85rem}
 
 <div class="hero">
   <h1><span>ePBS</span> &mdash; Enshrined Proposer-Builder Separation</h1>
-  <div class="sub">EIP-7732 &mdash; sentry, cannon, server, CL mimicry, &amp; TYSM observe hooks wired end-to-end. Snapshot fixtures + devnet verification remain.</div>
+  <div class="sub">EIP-7732 &mdash; sentry, cannon, server, CL mimicry, &amp; TYSM observe hooks wired end-to-end. TYSM event production <a href="#devnet">verified on local kurtosis devnet 2026-05-20</a>; sentry / cannon devnet verification + snapshot fixtures still pending.</div>
   <div class="meta">
     <span class="tag"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></span>
     <span class="tag"><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md">beacon-chain</a></span>
@@ -299,10 +299,11 @@ details .content p{font-size:0.85rem}
     </div>
   </details>
   <details>
-    <summary>DataColumnSidecar &mdash; Structural Change <span class="pill pill-info">DEFERRED</span></summary>
+    <summary>DataColumnSidecar &mdash; Structural Change <span class="pill pill-todo">GOSSIP TODO</span></summary>
     <div class="content">
       <p><a href="https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md#modified-datacolumnsidecar">Removed</a>: <code>signed_block_header</code>, <code>kzg_commitments</code>, <code>kzg_commitments_inclusion_proof</code>. Added: <code>slot</code>, <code>beacon_block_root</code>.</p>
-      <p>Preemptive projection columns reverted &mdash; revisit when real Gloas SSE payloads arrive.</p>
+      <p><strong>SSE &mdash; closed, no work.</strong> Verified against Prysm <code>develop</code> (2026-05-19): the <code>data_column_sidecar</code> SSE payload <code>DataColumnGossipEvent{slot, index, block_root, kzg_commitments}</code> is fork-agnostic &mdash; the event is a flat summary, so the structural change is invisible at the SSE layer. xatu already projects all of it; the sketched <code>sidecar_slot</code>/<code>sidecar_beacon_block_root</code> columns would just duplicate the existing <code>slot</code>/<code>block_root</code>. Decision D10 closed.</p>
+      <p><strong>Gossip &mdash; real work, now spec-concrete.</strong> The Gloas wire type <code>DataColumnSidecarGloas</code> drops the block header, so <code>pkg/clmimicry/gossipsub_data_column_sidecar.go</code> &mdash; which sources <code>slot</code>/<code>block_root</code>/<code>proposer_index</code>/<code>state_root</code>/<code>parent_root</code> from <code>GetSignedBlockHeader()</code> &mdash; nil-derefs on a Gloas sidecar. Fix: a fork-branched decoder reading <code>slot</code>/<code>block_root</code> directly from the sidecar, leaving the header-derived columns NULL for Gloas rows (additive). Needs the <code>DataColumnSidecarGloas</code> SSZ variant plumbed through tysm's <code>TraceEventDataColumnSidecar</code>.</p>
     </div>
   </details>
   <details>
@@ -368,7 +369,7 @@ details .content p{font-size:0.85rem}
     <tbody>
       <tr><td><code>beacon_api_eth_v2_beacon_block</code> / <code>canonical_beacon_block</code></td><td>+ <code>builder_index</code>, <code>bid_value</code>, <code>execution_payment</code>, <code>payload_present</code></td></tr>
       <tr><td><code>canonical_beacon_block_withdrawal</code></td><td>builder withdrawals via <code>BUILDER_INDEX_FLAG = 2^40</code></td></tr>
-      <tr><td>DataColumnSidecar tables (sentry + libp2p)</td><td><span class="pill pill-info">REVERTED</span> &mdash; preemptive <code>sidecar_slot</code>/<code>sidecar_beacon_block_root</code> projection columns dropped; revisit when real Gloas SSE payloads arrive</td></tr>
+      <tr><td>DataColumnSidecar tables (sentry + libp2p)</td><td><span class="pill pill-done">NO-OP</span> &mdash; no new columns; the SSE event is fork-agnostic and the gossip change is a decoder fix, not a schema change (D10 closed 2026-05-19)</td></tr>
     </tbody>
   </table>
   <h3 style="margin-top:1rem">Snapshot tests <span class="pill pill-todo">TODO(epbs)</span></h3>
@@ -478,15 +479,150 @@ xatu pkg/clmimicry router &rarr; server &rarr; ClickHouse</pre>
   </table>
 </section>
 
+<!-- DEVNET VERIFICATION -->
+<section id="devnet">
+  <h2>Devnet Verification <span class="pill pill-info">2026-05-20</span></h2>
+  <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">First end-to-end devnet test of the EPBS pipeline. Local kurtosis network (<code>ethereum-package</code>) with 6 CLs (2&times; prysm-tysm + lodestar + lighthouse), <code>gloas_fork_epoch: 1</code>. TYSM image: locally built <code>ethpandaops/tysm:glamsterdam-devnet-3</code> against <code>release/runtime-cfg-hooks</code>. Xatu at <code>release/gloas</code> HEAD <code>b86c4854</code>. No <code>xatu sentry</code> or <code>xatu cannon</code> attached &mdash; this run only verifies TYSM-produced events.</p>
+
+  <h3>Event status post-gloas activation (slot 32 = 02:50:56 UTC)</h3>
+  <p style="font-size:0.78rem;color:var(--text3);margin-bottom:0.5rem">Snapshot at 2026-05-20 03:13 UTC (epoch 4, slot ~145).</p>
+  <table>
+    <thead><tr><th>ID</th><th>Event</th><th>Producer</th><th>Rows</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>97</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE</code></td><td>TYSM</td><td>131</td><td><span class="pill pill-done">VERIFIED</span></td></tr>
+      <tr><td>98</td><td><code>GOSSIPSUB_EXECUTION_PAYLOAD_BID</code></td><td>TYSM</td><td>0</td><td><span class="pill pill-info">environmental</span> &mdash; no external builder in devnet, topic silent</td></tr>
+      <tr><td>99</td><td><code>GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE</code></td><td>TYSM</td><td>2,588</td><td><span class="pill pill-done">VERIFIED</span></td></tr>
+      <tr><td>100</td><td><code>GOSSIPSUB_PROPOSER_PREFERENCES</code></td><td>TYSM</td><td>50</td><td><span class="pill pill-done">VERIFIED</span> &mdash; initial impression of one-shot at activation was a fluke; periodic publishes confirmed</td></tr>
+      <tr><td>103</td><td><code>SYNTHETIC_PAYLOAD_STATUS_RESOLVED</code></td><td>TYSM</td><td>52</td><td><span class="pill pill-done">VERIFIED</span> &mdash; <code>PENDING &rarr; FULL</code> &amp; <code>PENDING &rarr; EMPTY</code> observed; <code>INVALID</code> needs adversarial mutator</td></tr>
+      <tr><td>104</td><td><code>SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT</code></td><td>TYSM</td><td>6</td><td><span class="pill pill-done">VERIFIED</span> &mdash; all <code>DROPPED</code>; <code>SETTLED</code> requires a builder-active devnet. Hook wired correctly.</td></tr>
+      <tr><td>105</td><td><code>SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED</code></td><td>TYSM</td><td>1,375</td><td><span class="pill pill-done">VERIFIED</span></td></tr>
+      <tr><td>89, 91&ndash;94, 101, 102</td><td>All sentry SSE events</td><td>sentry</td><td>0</td><td><span class="pill pill-info">N/A</span> &mdash; no sentry attached</td></tr>
+      <tr><td>90, 95, 96</td><td>All cannon-derived events</td><td>cannon</td><td>0</td><td><span class="pill pill-info">N/A</span> &mdash; no cannon attached</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:1rem">Devnet config note</h3>
+  <p style="font-size:0.82rem;color:var(--text2)"><code>gloas_fork_epoch</code> must be <strong>&ge; 1</strong>. With <code>gloas_fork_epoch: 0</code>, Prysm initial-sync on <code>glamsterdam-devnet-3</code> hangs at slot 0 with <code>WARN initial-sync: Execution payload envelope processing failure &mdash; beacon block root &lt;x&gt; not found in forkchoice</code>. Activating gloas at epoch 1 lets the chain come up under Fulu and transition cleanly. Prysm-side detail, not a xatu/TYSM concern.</p>
+
+  <h3 style="margin-top:1rem">Verification queries &amp; output</h3>
+  <p style="font-size:0.82rem;color:var(--text2)">Run from the kurtosis host against the local ClickHouse container; <code>_local</code> table suffix queries the actual storage node directly (the distributed view of the same name reads through to it).</p>
+
+  <h4 style="font-family:var(--mono);font-size:0.78rem;color:var(--white);margin:0.75rem 0 0.25rem">All-event count (canonical run-status query)</h4>
+  <pre>docker exec xatu-clickhouse-01 clickhouse-client --query "
+WITH events AS (
+  SELECT * FROM values('id UInt16, event String, tbl String',
+    ( 97, 'GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE',           'libp2p_gossipsub_execution_payload_envelope_local'),
+    ( 98, 'GOSSIPSUB_EXECUTION_PAYLOAD_BID',                'libp2p_gossipsub_execution_payload_bid_local'),
+    ( 99, 'GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE',          'libp2p_gossipsub_payload_attestation_message_local'),
+    (100, 'GOSSIPSUB_PROPOSER_PREFERENCES',                 'libp2p_gossipsub_proposer_preferences_local'),
+    (103, 'SYNTHETIC_PAYLOAD_STATUS_RESOLVED',              'beacon_synthetic_payload_status_resolved_local'),
+    (104, 'SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT',   'beacon_synthetic_builder_pending_payment_settlement_local'),
+    (105, 'SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED',        'beacon_synthetic_payload_attestation_processed_local')))
+SELECT e.id AS id, e.event AS event, t.total_rows AS rows
+FROM events e LEFT JOIN (
+  SELECT name, total_rows FROM system.tables WHERE database='default'
+) t ON t.name = e.tbl
+ORDER BY id FORMAT PrettyCompactMonoBlock"</pre>
+  <pre>   &#9484;&#9472;&#9472;id&#9472;&#9516;&#9472;event&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;rows&#9472;&#9488;
+1. &#9474;  97 &#9474; GOSSIPSUB_EXECUTION_PAYLOAD_ENVELOPE         &#9474;  131 &#9474;
+2. &#9474;  98 &#9474; GOSSIPSUB_EXECUTION_PAYLOAD_BID              &#9474;    0 &#9474;
+3. &#9474;  99 &#9474; GOSSIPSUB_PAYLOAD_ATTESTATION_MESSAGE        &#9474; 2588 &#9474;
+4. &#9474; 100 &#9474; GOSSIPSUB_PROPOSER_PREFERENCES               &#9474;   50 &#9474;
+5. &#9474; 103 &#9474; SYNTHETIC_PAYLOAD_STATUS_RESOLVED            &#9474;   52 &#9474;
+6. &#9474; 104 &#9474; SYNTHETIC_BUILDER_PENDING_PAYMENT_SETTLEMENT &#9474;    6 &#9474;
+7. &#9474; 105 &#9474; SYNTHETIC_PAYLOAD_ATTESTATION_PROCESSED      &#9474; 1375 &#9474;
+   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</pre>
+
+  <h4 style="font-family:var(--mono);font-size:0.78rem;color:var(--white);margin:0.75rem 0 0.25rem">Event 104 outcome breakdown &mdash; confirms hook fires both <code>SETTLED</code> &amp; <code>DROPPED</code>; only <code>DROPPED</code> seen because devnet has no builder</h4>
+  <pre>docker exec xatu-clickhouse-01 clickhouse-client --query "
+SELECT outcome, count() AS n,
+       toString(min(event_date_time)) AS first,
+       toString(max(event_date_time)) AS last
+FROM beacon_synthetic_builder_pending_payment_settlement
+WHERE event_date_time &gt; toDateTime64('2026-05-20 02:50:56',3,'UTC')
+GROUP BY outcome FORMAT PrettyCompactMonoBlock"</pre>
+  <pre>   &#9484;&#9472;outcome&#9472;&#9516;&#9472;n&#9472;&#9516;&#9472;first&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;last&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+1. &#9474; DROPPED &#9474; 4 &#9474; 2026-05-20 03:00:38.389 &#9474; 2026-05-20 03:09:56.111 &#9474;
+   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</pre>
+
+  <h4 style="font-family:var(--mono);font-size:0.78rem;color:var(--white);margin:0.75rem 0 0.25rem">Event 103 payload-status transitions</h4>
+  <pre>docker exec xatu-clickhouse-01 clickhouse-client --query "
+SELECT slot, status AS new, previous_status AS prev,
+       payload_timeliness_votes_positive AS timely_pos,
+       payload_timeliness_votes_negative AS timely_neg,
+       data_available_votes_positive AS data_pos,
+       ptc_size,
+       toString(event_date_time) AS ts
+FROM beacon_synthetic_payload_status_resolved_local
+WHERE event_date_time &gt; toDateTime64('2026-05-20 02:50:56',3,'UTC')
+ORDER BY event_date_time DESC LIMIT 5 FORMAT PrettyCompactMonoBlock"</pre>
+  <pre>   &#9484;&#9472;slot&#9472;&#9516;&#9472;new&#9472;&#9472;&#9516;&#9472;prev&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;timely_pos&#9472;&#9516;&#9472;timely_neg&#9472;&#9516;&#9472;data_pos&#9472;&#9516;&#9472;ptc_size&#9472;&#9516;&#9472;ts&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+1. &#9474;  137 &#9474; FULL &#9474; PENDING &#9474;         24 &#9474;       NULL &#9474;       24 &#9474;      512 &#9474; 2026-05-20 03:12:16.992 &#9474;
+2. &#9474;  136 &#9474; FULL &#9474; PENDING &#9474;         24 &#9474;       NULL &#9474;       24 &#9474;      512 &#9474; 2026-05-20 03:12:04.992 &#9474;
+3. &#9474;  133 &#9474; FULL &#9474; PENDING &#9474;         24 &#9474;       NULL &#9474;       24 &#9474;      512 &#9474; 2026-05-20 03:11:28.991 &#9474;
+4. &#9474;  132 &#9474; FULL &#9474; PENDING &#9474;         24 &#9474;       NULL &#9474;       24 &#9474;      512 &#9474; 2026-05-20 03:11:16.991 &#9474;
+5. &#9474;  127 &#9474; FULL &#9474; PENDING &#9474;         24 &#9474;       NULL &#9474;       24 &#9474;      512 &#9474; 2026-05-20 03:10:16.991 &#9474;
+   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</pre>
+
+  <h4 style="font-family:var(--mono);font-size:0.78rem;color:var(--white);margin:0.75rem 0 0.25rem">Event 105 sample rows &mdash; PTC-vote processing</h4>
+  <pre>docker exec xatu-clickhouse-01 clickhouse-client --query "
+SELECT slot, epoch, validator_index, payload_present AS payload, blob_data_available AS data_avail,
+       processing_duration_ms AS proc_ms,
+       toString(event_date_time) AS ts
+FROM beacon_synthetic_payload_attestation_processed_local
+WHERE event_date_time &gt; toDateTime64('2026-05-20 02:50:56',3,'UTC')
+ORDER BY event_date_time DESC LIMIT 5 FORMAT PrettyCompactMonoBlock"</pre>
+  <pre>   &#9484;&#9472;slot&#9472;&#9516;&#9472;epoch&#9472;&#9516;&#9472;validator_index&#9472;&#9516;&#9472;payload&#9472;&#9516;&#9472;data_avail&#9472;&#9516;&#9472;proc_ms&#9472;&#9516;&#9472;ts&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+1. &#9474;  142 &#9474;     4 &#9474;             538 &#9474; true    &#9474; true       &#9474;       0 &#9474; 2026-05-20 03:12:56.489 &#9474;
+2. &#9474;  142 &#9474;     4 &#9474;             612 &#9474; true    &#9474; true       &#9474;       0 &#9474; 2026-05-20 03:12:56.489 &#9474;
+3. &#9474;  142 &#9474;     4 &#9474;             546 &#9474; true    &#9474; true       &#9474;       0 &#9474; 2026-05-20 03:12:56.426 &#9474;
+4. &#9474;  142 &#9474;     4 &#9474;             167 &#9474; true    &#9474; true       &#9474;       2 &#9474; 2026-05-20 03:12:56.362 &#9474;
+5. &#9474;  141 &#9474;     4 &#9474;             751 &#9474; true    &#9474; true       &#9474;       0 &#9474; 2026-05-20 03:12:53.003 &#9474;
+   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</pre>
+
+  <h4 style="font-family:var(--mono);font-size:0.78rem;color:var(--white);margin:0.75rem 0 0.25rem">Event 97 sample rows &mdash; envelope gossip with peer-propagation timing</h4>
+  <pre>docker exec xatu-clickhouse-01 clickhouse-client --query "
+SELECT slot,
+       substring(toString(block_root),1,12) AS block_root,
+       builder_index,
+       propagation_slot_start_diff AS prop_ms,
+       toString(event_date_time) AS ts
+FROM libp2p_gossipsub_execution_payload_envelope_local
+WHERE event_date_time &gt; toDateTime64('2026-05-20 02:50:56',3,'UTC')
+ORDER BY event_date_time DESC LIMIT 5 FORMAT PrettyCompactMonoBlock"</pre>
+  <pre>   &#9484;&#9472;slot&#9472;&#9516;&#9472;block_root&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;builder_index&#9472;&#9516;&#9472;prop_ms&#9472;&#9516;&#9472;ts&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;
+1. &#9474;  142 &#9474; 0x945c9d3af2 &#9474; 18446744073709551615 &#9474;     201 &#9474; 2026-05-20 03:12:56.201 &#9474;
+2. &#9474;  142 &#9474; 0x945c9d3af2 &#9474; 18446744073709551615 &#9474;     160 &#9474; 2026-05-20 03:12:56.160 &#9474;
+3. &#9474;  141 &#9474; 0x8354ef89ce &#9474; 18446744073709551615 &#9474;     295 &#9474; 2026-05-20 03:12:44.295 &#9474;
+4. &#9474;  141 &#9474; 0x8354ef89ce &#9474; 18446744073709551615 &#9474;     277 &#9474; 2026-05-20 03:12:32.118 &#9474;
+5. &#9474;  140 &#9474; 0xb577a82463 &#9474; 18446744073709551615 &#9474;     118 &#9474; 2026-05-20 03:12:32.118 &#9474;
+   &#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</pre>
+  <p style="font-size:0.78rem;color:var(--text3)">(<code>builder_index = 18446744073709551615</code> = <code>UINT64_MAX</code> = <code>BUILDER_INDEX_SELF_BUILD</code> &mdash; expected on this devnet since proposers self-build.)</p>
+
+  <h3 style="margin-top:1rem">Followups for next devnet run</h3>
+  <ul style="font-size:0.85rem;color:var(--text2);line-height:1.6">
+    <li>Attach <code>xatu sentry</code> with Gloas+ SSE topics &rarr; unblocks events 89, 91&ndash;94, 101, 102.</li>
+    <li>Run <code>xatu cannon</code> after one finalized Gloas epoch &rarr; unblocks events 90, 95, 96 + additive column population.</li>
+    <li>Capture snapshot fixtures from this stack to replace the 10 placeholder tests under <code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code>.</li>
+    <li>Re-run on a devnet with mev-boost-relay + builder participant &rarr; exercises event 98 and gives <code>SETTLED</code> outcomes on event 104.</li>
+    <li>Exercise event 103 <code>INVALID</code> transitions via an adversarial blob/data-column mutator hook config on one of the TYSM CLs.</li>
+  </ul>
+
+  <p style="font-size:0.78rem;color:var(--text3);margin-top:0.75rem">Per-event row counts + verification queries: <a href="https://github.com/ethpandaops/tysm/blob/release/runtime-cfg-hooks/docs/glamsterdam-event-checklist.md"><code>tysm/docs/glamsterdam-event-checklist.md</code></a>.</p>
+</section>
+
 <!-- REMAINING WORK -->
 <section>
   <h2>Remaining Work</h2>
   <table>
     <thead><tr><th>Item</th><th>Where</th><th>Priority</th></tr></thead>
     <tbody>
-      <tr><td>Snapshot test fixtures (12 placeholder tests: 10 prior + 2 <code>beacon_synthetic_*</code>)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; needs Gloas devnet data</td></tr>
-      <tr><td><s>TYSM <code>OnPayloadAttestationProcessed</code></s></td><td>tysm + xatu</td><td><span class="pill pill-done">DONE</span> 2026-05-13 &mdash; synthetic event 105</td></tr>
-      <tr><td>Sentry Gloas block subscription &mdash; devnet verification</td><td><code>pkg/sentry/sentry.go</code></td><td><span class="pill pill-info">verify, not wire</span></td></tr>
+      <tr><td>Capture snapshot fixtures from the live kurtosis stack (10 placeholders + 2 <code>beacon_synthetic_*</code>)</td><td><code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td><td><span class="pill pill-p1">P1</span> &mdash; data is now available; just need to dump and seed</td></tr>
+      <tr><td><s>TYSM <code>OnPayloadAttestationProcessed</code></s></td><td>tysm + xatu</td><td><span class="pill pill-done">DONE</span> 2026-05-13 &mdash; synthetic event 105 verified on devnet 2026-05-20</td></tr>
+      <tr><td>Sentry Gloas block subscription &mdash; devnet verification</td><td><code>pkg/sentry/sentry.go</code></td><td><span class="pill pill-p1">P1</span> &mdash; attach <code>xatu sentry</code> to a TYSM CL beacon-api endpoint</td></tr>
+      <tr><td>Cannon devnet verification (events 90, 95, 96 + additive columns)</td><td><code>pkg/cannon/...</code></td><td><span class="pill pill-p1">P1</span> &mdash; run <code>xatu cannon</code> once a Gloas epoch finalizes</td></tr>
+      <tr><td>Re-run on a builder-active devnet to exercise event 98 (<code>EXECUTION_PAYLOAD_BID</code> gossip) and <code>SETTLED</code> outcomes on event 104</td><td>devnet config</td><td><span class="pill pill-info">follow-up</span></td></tr>
+      <tr><td>Exercise event 103 <code>INVALID</code> transitions via an adversarial mutator hook config</td><td>tysm hook config</td><td><span class="pill pill-info">follow-up</span></td></tr>
       <tr><td>Drop <code>go-ethereum</code> <code>replace</code> after ethcore <code>eth.NewPeer</code> bump</td><td><code>go.mod</code></td><td><span class="pill pill-info">follow-up</span></td></tr>
       <tr><td>Beacon API <code>head_v2</code> + <code>chain_reorg</code> field updates</td><td>sentry handler</td><td><span class="pill pill-info">in-flight upstream</span></td></tr>
     </tbody>

@@ -205,21 +205,21 @@ section:nth-child(8){animation-delay:0.35s}
       <h3><a href="epbs.html">Enshrined Proposer-Builder Separation</a></h3>
       <div class="eip"><a href="https://eips.ethereum.org/EIPS/eip-7732">EIP-7732</a></div>
       <div class="status-bar"><div class="fill fill-green" style="width:99%"></div></div>
-      <div class="pct">Sentry + cannon + server + CL mimicry + TYSM observe hooks wired &middot; snapshot fixtures + devnet verification remain</div>
+      <div class="pct">Sentry + cannon + server + CL mimicry + TYSM observe hooks wired &middot; TYSM events verified on kurtosis 2026-05-20 &middot; sentry/cannon devnet round-trip + snapshot fixtures remain</div>
     </div>
     <div class="status-card">
       <div class="label">TYSM Observe Hooks</div>
       <h3><a href="epbs.html#tysm">7 hooks wired end-to-end</a></h3>
       <div class="eip">4 gossip topics &middot; 3 synthetic lifecycle events</div>
       <div class="status-bar"><div class="fill fill-green" style="width:100%"></div></div>
-      <div class="pct">Pipeline verified: <code>apply-tysm-patch.sh</code> + <code>go build ./tysm/...</code> + <code>go build ./cmd/beacon-chain</code> clean</div>
+      <div class="pct">Verified on kurtosis devnet 2026-05-20: 6/7 ✅; event 98 (<code>EXECUTION_PAYLOAD_BID</code> gossip) dormant &mdash; environmental, no external builder in devnet</div>
     </div>
     <div class="status-card">
       <div class="label">Devnet Verification</div>
-      <h3>Pending Gloas devnet captures</h3>
-      <div class="eip">10 snapshot fixtures + sentry SSE round-trip</div>
-      <div class="status-bar"><div class="fill fill-amber" style="width:30%"></div></div>
-      <div class="pct">Blocked on real glamsterdam-devnet-3 payloads landing in xatu's ClickHouse</div>
+      <h3><a href="epbs.html#devnet">Kurtosis run 2026-05-20</a> &middot; partial</h3>
+      <div class="eip">TYSM events live &middot; sentry/cannon agents not yet attached</div>
+      <div class="status-bar"><div class="fill fill-amber" style="width:60%"></div></div>
+      <div class="pct">TYSM event production confirmed end-to-end through xatu&rarr;clickhouse on local kurtosis; needs <code>xatu sentry</code> + <code>xatu cannon</code> attached to a TYSM CL to verify the remaining 10 events. See <a href="epbs.html#devnet">live queries &amp; ClickHouse output</a>.</div>
     </div>
   </div>
 </section>
@@ -233,12 +233,27 @@ section:nth-child(8){animation-delay:0.35s}
       <tr>
         <td>Capture real Gloas devnet payloads and replace 10 placeholder snapshot fixtures under <code>pkg/clickhouse/route/{beacon,canonical,libp2p}/</code></td>
         <td><span class="pill pill-todo">DEVNET</span></td>
-        <td>Blocked on glamsterdam-devnet-3 traffic</td>
+        <td>Live TYSM events flowing on 2026-05-20 kurtosis run; ready to dump &amp; seed fixtures</td>
       </tr>
       <tr>
         <td>Verify sentry's Gloas-aware <code>DataVersionGloas</code> routing against a live devnet beacon node</td>
         <td><span class="pill pill-todo">DEVNET</span></td>
-        <td>Same</td>
+        <td>Attach <code>xatu sentry</code> to a TYSM CL beacon-api endpoint on next run</td>
+      </tr>
+      <tr>
+        <td>Run <code>xatu cannon</code> against a TYSM CL to verify events 90, 95, 96 + additive column populations</td>
+        <td><span class="pill pill-todo">DEVNET</span></td>
+        <td>Cannon types 17 / 18 wired in backfilling iterator; just needs a finalized Gloas epoch</td>
+      </tr>
+      <tr>
+        <td>Re-run on a builder-active devnet to exercise event 98 (<code>EXECUTION_PAYLOAD_BID</code> gossip) and confirm <code>SETTLED</code> outcomes on event 104</td>
+        <td><span class="pill pill-info">FOLLOW-UP</span></td>
+        <td>Kurtosis devnet has no external builder; both events are environmental there</td>
+      </tr>
+      <tr>
+        <td>Exercise event 103 <code>INVALID</code> payload-status transitions via an adversarial blob / data-column mutator hook config</td>
+        <td><span class="pill pill-info">FOLLOW-UP</span></td>
+        <td>Currently only <code>FULL</code> &amp; <code>EMPTY</code> transitions observed on 2026-05-20 run</td>
       </tr>
       <tr>
         <td><code>fast_confirmation</code> SSE subscription (<a href="https://github.com/ethereum/beacon-APIs/pull/598">beacon-APIs #598</a>)</td>
