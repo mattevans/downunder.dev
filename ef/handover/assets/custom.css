@@ -1,0 +1,471 @@
+/* handover-site custom theming on top of docsify vue.css.
+   Dark + warm, mono headings, slight personal touch. */
+
+:root {
+  --theme-color: #22d3a8;
+  --theme-color-secondary: #f5a623;
+
+  --bg: #0b0e14;
+  --bg-2: #11151c;
+  --bg-3: #1a212d;
+  --border: #1f2937;
+  --border-2: #2a3a4e;
+
+  --text: #cbd5e1;
+  --text-dim: #94a3b8;
+  --text-faint: #64748b;
+  --heading: #f1f5f9;
+
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(34, 211, 168, 0.04), transparent),
+    radial-gradient(ellipse 60% 40% at 85% 100%, rgba(245, 166, 35, 0.025), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-name-link,
+.app-name-link:hover {
+  color: var(--heading);
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sidebar {
+  background: var(--bg-2);
+  border-right: 1px solid var(--border);
+}
+
+/* hamburger toggle at bottom-left — vue.css gives it a white bg, override */
+.sidebar-toggle,
+body.close .sidebar-toggle {
+  background: var(--bg-2) !important;
+  border-top: 1px solid var(--border) !important;
+}
+.sidebar-toggle:hover { background: var(--bg-3) !important; }
+.sidebar-toggle span { background-color: var(--theme-color); }
+.sidebar > h1 { margin-top: 1rem; }
+.sidebar ul li a {
+  color: var(--text-dim);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.sidebar ul li a:hover {
+  color: var(--theme-color);
+  text-decoration: none;
+}
+.sidebar ul li.active > a,
+.sidebar ul li.collapse .app-sub-sidebar.active > a {
+  color: var(--theme-color);
+  border-right: 2px solid var(--theme-color);
+}
+.sidebar ul li strong,
+.sidebar ul li > p > strong {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.app-nav {
+  background: rgba(11, 14, 20, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.app-nav > a,
+.app-nav li {
+  margin: 0 0.5rem !important;
+  padding: 5px 0 !important;
+}
+.app-nav a {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  /* reserve border-bottom space so active items don't shift adjacent items */
+  border-bottom: 2px solid transparent;
+  padding-bottom: 3px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.app-nav a:hover { color: var(--theme-color); }
+.app-nav a.active {
+  color: var(--theme-color);
+  border-bottom: 2px solid var(--theme-color) !important;
+}
+
+/* dark fly-out dropdown (overrides vue.css white default) */
+.app-nav li ul {
+  background-color: var(--bg-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  padding: 0.4rem 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  min-width: 140px;
+}
+.app-nav li ul li {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+.app-nav li ul li a {
+  display: block !important;
+  padding: 0.45rem 1rem !important;
+  margin: 0 !important;
+  font-size: 0.78rem !important;
+  color: var(--text) !important;
+  border-bottom: none !important;
+}
+.app-nav li ul li a:hover {
+  background: var(--bg-3);
+  color: var(--theme-color) !important;
+}
+.app-nav li ul li a.active {
+  color: var(--theme-color) !important;
+  background: var(--bg-3);
+}
+
+.markdown-section {
+  color: var(--text);
+  max-width: 900px;
+  padding: 2.5rem 3rem 5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4,
+.markdown-section h5,
+.markdown-section h6 {
+  color: var(--heading);
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.markdown-section h1 { font-size: 1.9rem; margin: 0 0 1rem; }
+.markdown-section h2 {
+  font-size: 1.25rem;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.markdown-section h3 { font-size: 1rem; margin: 1.75rem 0 0.6rem; }
+.markdown-section h4 { font-size: 0.85rem; margin: 1.25rem 0 0.4rem; color: var(--text); }
+
+.markdown-section a {
+  color: var(--theme-color);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(34, 211, 168, 0.4);
+}
+.markdown-section a:hover {
+  border-bottom-color: var(--theme-color);
+}
+
+.markdown-section strong { color: var(--heading); }
+.markdown-section em { color: var(--text); }
+
+.markdown-section blockquote {
+  border-left: 3px solid var(--theme-color-secondary);
+  background: var(--bg-2);
+  color: var(--text);
+  padding: 0.75rem 1rem;
+  margin: 1.25rem 0;
+  border-radius: 0 6px 6px 0;
+  font-style: normal;
+}
+.markdown-section blockquote p { font-size: 0.92rem; margin: 0; }
+
+.markdown-section code {
+  background: var(--bg-3);
+  color: var(--theme-color);
+  font-family: var(--mono);
+  font-size: 0.82em;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+.markdown-section pre {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem !important;
+  margin: 1.25rem 0;
+  overflow-x: auto;
+}
+.markdown-section pre > code {
+  background: transparent !important;
+  color: var(--text);
+  border: none;
+  font-size: 0.82rem;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* prism token colors tuned for the dark bg */
+.token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--text-faint); font-style: italic; }
+.token.punctuation { color: var(--text-dim); }
+.token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #f5a623; }
+.token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #22d3a8; }
+.token.operator, .token.entity, .token.url, .token.variable { color: #a78bfa; }
+.token.atrule, .token.attr-value, .token.function, .token.class-name { color: #60a5fa; }
+.token.keyword { color: #f472b6; }
+.token.regex, .token.important { color: #f5a623; }
+
+.markdown-section table {
+  display: table;
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.markdown-section thead { background: var(--bg-3); }
+.markdown-section th {
+  background: var(--bg-3) !important;
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border: none !important;
+  border-bottom: 1px solid var(--border-2) !important;
+}
+.markdown-section td {
+  padding: 0.6rem 0.9rem;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  vertical-align: top;
+  color: var(--text);
+  background: transparent !important;
+}
+.markdown-section tr { border: none !important; }
+.markdown-section tbody tr:last-child td { border-bottom: none !important; }
+
+/* kill docsify vue.css zebra stripe — it washes out dark text */
+.markdown-section tr:nth-child(2n) { background-color: transparent !important; }
+
+/* unified hover */
+.markdown-section tbody tr { transition: background 0.12s; }
+.markdown-section tbody tr:hover td { background: rgba(34, 211, 168, 0.04) !important; }
+
+.markdown-section hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* status pills, used inline via inline html */
+.pill {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.18em 0.55em;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  vertical-align: middle;
+}
+.pill-done    { background: rgba(34,211,168,0.1); color: #22d3a8; border-color: rgba(34,211,168,0.25); }
+.pill-flight  { background: rgba(245,166,35,0.1); color: #f5a623; border-color: rgba(245,166,35,0.25); }
+.pill-new     { background: rgba(96,165,250,0.1); color: #60a5fa; border-color: rgba(96,165,250,0.25); }
+.pill-todo    { background: rgba(245,166,35,0.1); color: #f5a623; border-color: rgba(245,166,35,0.25); }
+.pill-blocked { background: rgba(239,68,68,0.1);  color: #ef4444; border-color: rgba(239,68,68,0.25); }
+.pill-info    { background: rgba(167,139,250,0.1);color: #a78bfa; border-color: rgba(167,139,250,0.25); }
+
+/* project cards (rendered via inline html on homepage) */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: border-color 0.18s, transform 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.card:hover {
+  border-color: var(--theme-color);
+  transform: translateY(-2px);
+}
+.card > * { margin: 0 !important; }
+.card h3, .card h4 {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  border-bottom: none;
+  padding: 0;
+}
+.card h3 a, .card h4 a {
+  color: var(--heading);
+  border-bottom: none;
+}
+.card h3 a:hover, .card h4 a:hover { color: var(--theme-color); }
+.card p em:only-child {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.card p { font-size: 0.85rem; color: var(--text); line-height: 1.55; }
+
+/* search plugin styling */
+.sidebar .search {
+  margin: 0;
+  padding: 1rem 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar .search .input-wrap {
+  position: relative;
+}
+.sidebar .search input {
+  background: var(--bg-3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.7rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.sidebar .search input:focus {
+  border-color: var(--theme-color);
+  box-shadow: 0 0 0 2px rgba(34, 211, 168, 0.15);
+}
+.sidebar .search input::placeholder { color: var(--text-faint); }
+.sidebar .search .clear-button { color: var(--text-faint); }
+.sidebar .search .clear-button:hover { color: var(--theme-color); }
+
+/* results panel */
+.sidebar .results-panel {
+  margin: 0;
+  padding: 0 0.85rem 5rem; /* generous bottom pad so toggle bar doesn't overlap */
+  color: var(--text);
+}
+.sidebar .results-panel.show {
+  padding-top: 0.5rem;
+}
+
+/* each result */
+.sidebar .matching-post {
+  padding: 0.85rem 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+  margin: 0 !important;
+}
+.sidebar .matching-post:last-child { border-bottom: none !important; }
+
+/* result title (the heading match) */
+.sidebar .matching-post h2,
+.sidebar .matching-post .search-h2 {
+  margin: 0 0 0.4rem !important;
+  padding: 0 !important;
+  font-family: var(--mono) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: var(--heading) !important;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+.sidebar .matching-post a {
+  display: block;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  color: var(--heading);
+}
+.sidebar .matching-post a:hover h2,
+.sidebar .matching-post a:hover .search-h2 { color: var(--theme-color) !important; }
+
+/* result excerpt */
+.sidebar .matching-post p {
+  margin: 0 !important;
+  font-family: var(--sans) !important;
+  font-size: 0.78rem !important;
+  line-height: 1.55 !important;
+  color: var(--text-dim) !important;
+  font-weight: 400 !important;
+}
+
+/* keyword highlight (em tag with .search-keyword) */
+.sidebar .search .search-keyword,
+.sidebar .matching-post .search-keyword {
+  color: var(--theme-color) !important;
+  background: rgba(34, 211, 168, 0.12);
+  padding: 0 0.2em;
+  border-radius: 2px;
+  font-style: normal !important;
+  font-weight: 600;
+}
+
+/* "no results" state */
+.sidebar .search p:not(.matching-post) {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+/* copy-code plugin button */
+.docsify-copy-code-button {
+  background: var(--bg-3) !important;
+  color: var(--text-dim) !important;
+  font-family: var(--mono) !important;
+  font-size: 0.7rem !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px !important;
+}
+
+/* mermaid container */
+.mermaid {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* responsive trim */
+@media (max-width: 768px) {
+  .markdown-section { padding: 1.5rem 1.25rem 4rem; }
+  .cards { grid-template-columns: 1fr; }
+}
