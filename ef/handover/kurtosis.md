@@ -2,7 +2,7 @@
 
 > The full devnet config I've been using locally to exercise the Gloas pipeline end-to-end.
 
-### what runs on the host (NOT in kurtosis)
+## what runs on the host
 
 The TYSM `xatu` hook publishes to `host.docker.internal:8080`, so you need:
 
@@ -210,29 +210,29 @@ port_publisher:
 Four terminals, in this order:
 
 ```bash
-# 1. start the xatu data pipeline (consumoor + kafka + clickhouse + zookeeper +
-#    xatu server on :8080) — TYSM containers publish events to
-#    host.docker.internal:8080
-cd $GOPATH/src/github.com/ethpandaops/xatu
+# 1. in your local clone of ethpandaops/xatu — start the data pipeline
+#    (consumoor + kafka + clickhouse + zookeeper + xatu server on :8080).
+#    TYSM containers publish events to host.docker.internal:8080.
+cd <path-to>/xatu
 docker compose up -d
 
-# 2. spin up the kurtosis enclave from inside the ethereum-package directory
-cd $GOPATH/src/github.com/ethpandaops/ethereum-package
+# 2. in your local clone of ethpandaops/ethereum-package — spin up the enclave
+cd <path-to>/ethereum-package
 kurtosis run \
   --enclave tysm \
   --image-download missing \
   --args-file gloas2.yaml \
   .
 
-# 3. start bad-tysm with docker discovery on; it will auto-pick-up every TYSM
-#    container kurtosis spawned in step 2
-cd $GOPATH/src/github.com/ethpandaops/bad-tysm
+# 3. in your local clone of ethpandaops/bad-tysm — start with docker discovery
+#    on; it'll auto-pick-up every TYSM container kurtosis spawned in step 2
+cd <path-to>/bad-tysm
 BADTYSM_CONFIG_FILE=./config.yaml \
 BAD_TYSM_AUTH_REF_TOKEN=dev \
 go run ./cmd/badtysm
 
 # 4. new terminal — bad-tysm frontend (Vite on :5173, proxies /api/* to :8666)
-cd $GOPATH/src/github.com/ethpandaops/bad-tysm/frontend
+cd <path-to>/bad-tysm/frontend
 pnpm dev
 ```
 

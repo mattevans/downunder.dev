@@ -453,6 +453,26 @@ body.close .sidebar-toggle {
   border-radius: 4px !important;
 }
 
+/* global footer (injected via docsify plugin in index.html) */
+.handover-footer {
+  margin: 4rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.handover-footer p {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.handover-footer .heart {
+  display: inline-block;
+  margin-left: 0.15em;
+  transform: translateY(0.05em);
+}
+
 /* mermaid container */
 .mermaid {
   background: var(--bg-2);

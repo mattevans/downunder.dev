@@ -200,7 +200,7 @@ sequenceDiagram
 ### build (local)
 
 ```bash
-cd $GOPATH/src/github.com/ethpandaops/tysm
+# from your local clone of ethpandaops/tysm
 ./scripts/tysm-build.sh -r OffchainLabs/prysm -b develop
 # output: prysm/build/beacon-chain, prysm/build/validator
 ```

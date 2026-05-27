@@ -36,6 +36,17 @@ Complete overhaul. Postgres-backed registration/dereg, heartbeats, run hooks on 
 
 </div>
 
+## open PRs
+
+The actual deliverables to track / merge:
+
+| PR | covers |
+|---|---|
+| [ethpandaops/xatu#795](https://github.com/ethpandaops/xatu/pull/795) | all of the xatu glamsterdam work — ePBS + BAL events through sentry, cannon, server, CL mimicry; routing migrated to consumoor |
+| [ethpandaops/tysm#17](https://github.com/ethpandaops/tysm/pull/17) | all of the tysm changes — Gloas event publishing, runtime hook control HTTP API, push-discovery to bad-tysm |
+| [ethpandaops/bad-tysm](https://github.com/ethpandaops/bad-tysm) | the whole repo is the deliverable (brand-new project); reviewable as the merged commit series on `master` |
+| [ethpandaops/platform#346](https://github.com/ethpandaops/platform/pull/346) | infra + gitops for bad-tysm, plus ingress for the new tysm runtime API. <span class="pill pill-todo">untested</span> — needs verifying once merged |
+
 ## where to start
 
 If you're inheriting this work cold, I'd read in this order:

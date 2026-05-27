@@ -27,7 +27,7 @@ The core infrastructure is wired across every layer:
 
 - **Proto types** — 6 new files defining `ExecutionPayloadBid` / `SignedExecutionPayloadBid` (with `execution_requests_root`), `ExecutionPayloadEnvelope` / `SignedExecutionPayloadEnvelope` (with `parent_beacon_block_root`), `PayloadAttestationData` / `PayloadAttestationMessage` / `PayloadAttestation` / `IndexedPayloadAttestation`, `Builder`, `ProposerPreferences` / `SignedProposerPreferences`. Spec refs: [`specs/gloas/beacon-chain.md`](https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/beacon-chain.md) and [`p2p-interface.md`](https://github.com/ethereum/consensus-specs/blob/master/specs/gloas/p2p-interface.md).
 
-- **New events allocated** — 12 sentry/cannon events + 3 TYSM synthetic. See the master plan for the full table.
+- **New events allocated** — 12 sentry/cannon events + 3 TYSM synthetic. The full list is in the proto at `pkg/proto/xatu/event_ingester.proto`.
 
 - **Sentry SSE integration** — 6 callbacks wired in `pkg/sentry/sentry.go` with handlers in `pkg/sentry/event/beacon/eth/v1/`:
   | callback | event | description |
@@ -69,7 +69,7 @@ The core infrastructure is wired across every layer:
 
 - **Proto definitions** — `BlockAccessList`, `BlockAccessListEntry` with all **6** change types: `storage_changes`, `storage_reads`, `balance_changes`, `nonce_changes`, `code_changes`, plus `touched` accounts (the 6th one is easy to miss — the spec includes it). All in `eth/v1/block_access_list.proto`.
 
-- **Execution payload integration** — `ExecutionPayloadGloas` carries `block_access_list: BlockAccessList` (field 18) and `slot_number: uint64` (field 19, EIP-7843). The latter was never written into the plans but it's there.
+- **Execution payload integration** — `ExecutionPayloadGloas` carries `block_access_list: BlockAccessList` (field 18) and `slot_number: uint64` (field 19, EIP-7843). The `slot_number` field is easy to overlook but it's wired.
 
 - **Cannon deriver** — `NewBlockAccessListDeriver` sources from envelope (Gloas path: `envelope.Payload.BlockAccessList`; pre-Gloas: no-op).
 
@@ -131,9 +131,7 @@ Sentry and cannon agents were not attached on the 2026-05-20 run. These need a f
 
 ### ongoing — upstream tracking
 
-6–9 — see [upstream PRs to watch](#upstream-prs-to-watch) below.
-
-## upstream dependencies
+See [upstream PRs to watch](#upstream-prs-to-watch) below.
 
 ## upstream PRs to watch
 
@@ -143,7 +141,7 @@ These are the schematic blockers.
 |---|---|---|---|---|
 | [#5241](https://github.com/ethereum/consensus-specs/pull/5241) | consensus-specs | Per-builder configs in `ProposerPreferences` | <span class="pill pill-blocked">high</span> — additive proto + ClickHouse columns | open |
 | [#593](https://github.com/ethereum/beacon-APIs/pull/593) | beacon-APIs | `proposer_preferences` SSE + pool API | <span class="pill pill-blocked">high</span> — our handler shipped early; if topic name/schema diverges, we follow | open |
-| [#5221](https://github.com/ethereum/consensus-specs/pull/5221) | consensus-specs | Separate pending builder deposits queue | <span class="pill pill-todo">med</span> — affects builder registry snapshot shape (open Q #6) | draft |
+| [#5221](https://github.com/ethereum/consensus-specs/pull/5221) | consensus-specs | Separate pending builder deposits queue | <span class="pill pill-todo">med</span> — affects builder registry snapshot shape | draft |
 | [#590](https://github.com/ethereum/beacon-APIs/pull/590) | beacon-APIs | `head_v2` event, deprecates `head` | <span class="pill pill-todo">med</span> — add Gloas+ subscription, keep `head` for pre-Gloas | open |
 | [#585](https://github.com/ethereum/beacon-APIs/pull/585) | beacon-APIs | Execution block hashes in `chain_reorg` SSE | <span class="pill pill-todo">med</span> — additive nullable columns `old/new_execution_block_hash` | open |
 
