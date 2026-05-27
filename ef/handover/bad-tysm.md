@@ -24,6 +24,14 @@ One Go binary with an embedded React frontend.
 | React frontend | <span class="pill pill-done">done</span> · 8 pages |
 | OIDC auth | <span class="pill pill-done">done</span> · dex for local dev |
 
+## walkthrough
+
+Short tour of the bad-tysm UI driving a TYSM fleet — fleet view, registering / discovering nodes, creating an activation, watching events stream in from ClickHouse.
+
+<div class="video-embed">
+  <iframe src="https://www.youtube.com/embed/KTDmFp0U5ps" title="bad-tysm walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+
 ## HTTP API surface
 
 Three flavours: observability (read ClickHouse), control (read/write Postgres + proxy tysm), discovery (the inbound side for tysm push-registration).
