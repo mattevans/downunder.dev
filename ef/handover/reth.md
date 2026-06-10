@@ -8,16 +8,16 @@
 
 SQLite remains the local source of truth. Each `(analysis configuration, schedule, block)` output and its export payload are committed atomically, then an embedded worker drains a durable outbox over HTTPS using `JSONEachRow`. Delivery is at-least-once; deterministic IDs, insert deduplication tokens, and `ReplacingMergeTree` make retries idempotent.
 
-The staging ClickHouse side is already provisioned: the dedicated `gas_analysis` database exists, schema migration `001` has been applied, and the runtime account has read/write permissions scoped to that database. The GitOps migrator is also live under [`gas-analysis-migrator`](https://github.com/ethpandaops/platform/tree/master/environments/staging/applications/gas-analysis-migrator).
+The ClickHouse side is already provisioned: the dedicated `gas_analysis` database exists, schema migration `001` has been applied, and the runtime account has read/write permissions scoped to that database. The GitOps migrator is also live under [`gas-analysis-migrator`](https://github.com/ethpandaops/platform/tree/master/environments/staging/applications/gas-analysis-migrator).
 
-| area | state |
-|---|---|
-| Embedded exporter | <span class="pill pill-done">done</span> |
-| Transactional SQLite outbox | <span class="pill pill-done">done</span> · schema v10 |
-| ClickHouse schema | <span class="pill pill-done">done</span> · 4 distributed tables + local replicas |
-| Staging database + scoped account | <span class="pill pill-done">done</span> · `gas_analysis` |
-| Staging migrations | <span class="pill pill-done">applied</span> · pinned to `1f639feed` |
-| Producer runtime rollout | <span class="pill pill-todo">not confirmed</span> · configure and start `reth-research` with export enabled |
+| area                        | state                                                                                                                           |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Embedded exporter           | <span class="pill pill-done">done</span>                                                                                        |
+| Transactional SQLite outbox | <span class="pill pill-done">done</span> · schema v10                                                                           |
+| ClickHouse schema           | <span class="pill pill-done">done</span> · 4 distributed tables + local replicas                                                |
+| Database + scoped account   | <span class="pill pill-done">done</span> · `gas_analysis`                                                                       |
+| Migrations                  | <span class="pill pill-done">applied</span> · pinned to `1f639feed`                                                             |
+| Producer runtime rollout    | <span class="pill pill-todo">not confirmed</span> · configure and start `reth-research` with export enabled (Waiting on Carlos) |
 
 ## architecture
 
@@ -354,9 +354,9 @@ Companion columns are:
 | `schedule_event_log_count` | schedule log count |
 | `opcode_capture_complete` | `NULL` in v1; the inspector truncation flag is not yet propagated |
 
-## staging ClickHouse and migrations
+## ClickHouse and migrations
 
-The ClickHouse deployment work is complete for staging:
+The ClickHouse deployment work is complete:
 
 - dedicated database: `gas_analysis`;
 - dedicated runtime account with read/write access scoped to `gas_analysis.*`;
