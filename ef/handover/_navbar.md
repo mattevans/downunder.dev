@@ -3,4 +3,5 @@
   - [xatu](xatu.md)
   - [tysm](tysm.md)
   - [bad-tysm](bad-tysm.md)
+  - [reth-research](reth.md)
   - [kurtosis](kurtosis.md)

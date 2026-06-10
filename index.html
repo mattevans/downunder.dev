@@ -32,17 +32,20 @@
         to   { opacity: 1; transform: translateY(0); }
       }
       .animate-in { animation: fade-up 0.9s ease-out both; }
+
+      html { scrollbar-width: none; }
+      html::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="min-h-dvh bg-zinc-950 text-zinc-100 font-sans antialiased selection:bg-orange-500/30 selection:text-white overflow-hidden">
+<body class="min-h-dvh bg-zinc-950 text-zinc-100 font-sans antialiased selection:bg-orange-500/30 selection:text-white">
 
-    <main class="relative min-h-dvh flex flex-col items-center justify-center px-6">
+    <main class="relative min-h-dvh flex flex-col items-center justify-center px-6 py-4">
 
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-radial-[at_50%_42%] from-orange-500/25 via-zinc-950/0 to-zinc-950 animate-breathe"></div>
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-radial-[at_50%_120%] from-sky-500/10 via-zinc-950/0 to-transparent"></div>
       <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent"></div>
 
-      <div class="relative flex flex-col items-center gap-8 animate-in">
+      <div class="relative flex flex-col items-center gap-6 animate-in">
 
         <div class="relative">
           <div aria-hidden="true" class="absolute -inset-8 rounded-full bg-orange-500/25 blur-3xl"></div>
@@ -52,7 +55,7 @@
             alt="matty evans"
             width="288"
             height="288"
-            class="relative size-56 rounded-full ring-1 ring-white/10 shadow-2xl shadow-black/60 sm:size-64 md:size-72"
+            class="relative size-44 rounded-full ring-1 ring-white/10 shadow-2xl shadow-black/60 sm:size-52 md:size-56"
           >
         </div>
 
@@ -65,7 +68,27 @@
           </p>
         </div>
 
-        <nav class="mt-2 flex flex-wrap items-center justify-center gap-3">
+        <div class="max-w-prose space-y-4 text-center text-sm/7 text-zinc-400 sm:text-base/7">
+          <p>
+            I'm a Forward Deployed Engineer at
+            <a href="https://amplabs.com" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">Amp Labs</a>.
+            We're building the model for how high-performance engineering teams will operate on the frontier.
+          </p>
+          <p>
+            Before that, I was at the
+            <a href="https://ethereum.foundation" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">Ethereum Foundation</a>
+            working on observability across the network, and Director of Engineering at
+            <a href="https://tractorventures.com" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">Tractor Ventures</a>.
+            Earlier stints at
+            <a href="https://ladbrokes.com.au" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">Entain</a>,
+            <a href="https://saatchi.co.uk" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">Saatchi &amp; Saatchi</a>
+            (London and New York), and
+            <a href="https://sitepoint.com" target="_blank" rel="noopener noreferrer" class="text-zinc-100 underline decoration-zinc-700 underline-offset-4 transition hover:decoration-orange-400 hover:text-white">SitePoint</a>.
+          </p>
+          <p class="text-zinc-500">Based in Brisbane, Australia.</p>
+        </div>
+
+        <nav class="flex flex-wrap items-center justify-center gap-3">
           <a
             href="https://github.com/mattevans"
             target="_blank"
@@ -90,6 +113,19 @@
             </svg>
             <span>x</span>
             <span class="font-mono text-xs text-zinc-500 group-hover:text-zinc-300">/mattevansnz</span>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/mathewevans/"
+            target="_blank"
+            rel="me noopener noreferrer"
+            class="group inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm/6 font-medium text-zinc-200 backdrop-blur-sm transition duration-200 hover:-translate-y-0.5 hover:border-orange-400/40 hover:bg-white/10 hover:text-white hover:shadow-lg hover:shadow-orange-500/10"
+          >
+            <svg viewBox="0 0 24 24" class="size-4 fill-current" aria-hidden="true">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.37-1.852 3.601 0 4.267 2.37 4.267 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+            <span>linkedin</span>
+            <span class="font-mono text-xs text-zinc-500 group-hover:text-zinc-300">/mathewevans</span>
           </a>
         </nav>
       </div>
