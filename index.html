@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f1ea">
   <title>Matty Evans</title>
-  <meta name="description" content="Matty Evans is a Forward Deployed Engineer at Amp, based in Brisbane, Australia.">
+  <meta name="description" content="Matty Evans is a Forward Deployed Engineer at Amp Labs, based in Brisbane, Australia.">
   <meta property="og:title" content="Matty Evans">
-  <meta property="og:description" content="Forward Deployed Engineer at Amp. Previously the Ethereum Foundation.">
+  <meta property="og:description" content="Forward Deployed Engineer at Amp Labs. Previously the Ethereum Foundation.">
   <meta property="og:image" content="https://www.downunder.dev/new.png?v=20260824">
   <meta property="og:url" content="https://downunder.dev">
   <meta name="twitter:card" content="summary">
@@ -24,14 +24,27 @@
     img { display: block; width: 4.5rem; height: 4.5rem; margin-bottom: 2.25rem; border-radius: 50%; }
     h1 { margin: 0 0 1.5rem; font-size: 1.3rem; font-weight: 500; }
     p { margin: 0 0 1.15rem; }
-    a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: .18em; }
-    a:hover { text-decoration-thickness: 2px; }
+    a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: .18em; transition: text-decoration-thickness .2s, text-underline-offset .2s; }
+    a:hover { text-decoration-thickness: 2px; text-underline-offset: .24em; }
     a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
     .then { color: var(--muted); }
     blockquote { margin: 2.25rem 0; padding-left: 1.25rem; border-left: 2px solid var(--rule); color: #3b3832; font-style: italic; }
     blockquote footer { margin-top: .5rem; color: var(--muted); font-size: 1rem; font-style: normal; }
     .links { display: flex; flex-wrap: wrap; gap: 1.4rem; margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 1.05rem; }
     .links span { margin-left: auto; color: var(--muted); }
+    img { transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+    img:hover { transform: rotate(-8deg) scale(1.04); }
+    main > * { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+    main > :nth-child(2) { animation-delay: .08s; }
+    main > :nth-child(3) { animation-delay: .16s; }
+    main > :nth-child(4) { animation-delay: .24s; }
+    main > :nth-child(5) { animation-delay: .32s; }
+    main > :nth-child(6) { animation-delay: .4s; }
+    main > :nth-child(7) { animation-delay: .48s; }
+    @keyframes rise { from { opacity: 0; transform: translateY(.6rem); } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
     @media (max-width: 480px) {
       body { font-size: 1.15rem; }
       main { padding-top: 3.5rem; }
@@ -45,9 +58,9 @@
     <img src="/new.png?v=20260824" alt="Matty Evans" width="512" height="512">
     <h1>G'day, I'm Matty.</h1>
 
-    <p>I'm a Forward Deployed Engineer at <a href="https://ampcode.com">Amp</a>. I work inside the codebases of the teams we work with, in their repos, their CI and their odd internal tooling, and help them get agents doing real work in production.</p>
+    <p>I'm a Forward Deployed Engineer at <a href="https://ampcode.com">Amp Labs</a>. I work inside the codebases of the teams we work with, in their repos, their CI and their odd internal tooling, and help them get agents doing real work in production.</p>
 
-    <p>Before Amp I was at the <a href="https://ethereum.foundation">Ethereum Foundation</a> on ethPandaOps, building the devnet and observability tooling that Ethereum upgrades get tested on. Before that, <a href="https://tractorventures.com">Tractor Ventures</a>.</p>
+    <p>Before Amp Labs I was at the <a href="https://ethereum.foundation">Ethereum Foundation</a> on ethPandaOps, building the devnet and observability tooling that Ethereum upgrades get tested on. Before that, <a href="https://tractorventures.com">Tractor Ventures</a>.</p>
 
     <p class="then">Earlier: Populate in Auckland, Saatchi &amp; Saatchi in London and New York, Wave Digital in Melbourne, and teaching web development at Natcoll in New Zealand. I'm a Kiwi and I live in Brisbane.</p>
 
